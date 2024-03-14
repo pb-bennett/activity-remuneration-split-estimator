@@ -1,3 +1,6 @@
+// import { v4 as uuidv4 } from "https://jspm.dev/uuid";
+// import { v4 as uuidv4 } from "uuid";
+
 import Player from "./Player.js";
 import HtmlBuilder from "./HtmlBuilder.js";
 
@@ -9,9 +12,12 @@ class MiningOp {
     this.playerMembers = [];
     this.addPlayerMember(fleetLeader);
     this.htmlBuilder = new HtmlBuilder();
+    this.isActive = false;
+    // this.id = uuidv4();
+    this.id = self.crypto.randomUUID();
   }
   buildHtml() {
-    return this.htmlBuilder.execute(this);
+    return this.htmlBuilder.opHtml(this);
   }
   showDetails() {
     console.log(this.fleetLeader, this.fleetName, this.startTime);

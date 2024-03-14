@@ -1,3 +1,5 @@
+import flatpickr from "flatpickr";
+
 import MiningOp from "./Classes/MiningOp.js";
 import { datePickerOptions } from "./options.js";
 
@@ -10,6 +12,11 @@ $(document).ready(function () {
     $(newFleetModal).modal("hide");
     $("#newFleetModalBtn").prop("disabled", true);
     $("#showDetails").prop("disabled", false);
+    console.log(miningOp.buildHtml());
+    $("#mainContainer").html(miningOp.buildHtml());
+    setInterval(() => {
+      $("#mainContainer").html(miningOp.buildHtml());
+    }, 1000);
   });
   flatpickr("#datepicker", datePickerOptions);
   $("#showDetails")

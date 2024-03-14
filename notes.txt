@@ -1,0 +1,7 @@
+         <a href="#">
+            <img src="./img/${player.isActive ? "pause" : "play"}.svg" width="16" alt="pause icon" data-playerId="${player.id}/>
+          </a>
+          <div>Player Work-Time: 01:04:01</div>
+          <a href="#">
+            <img src="./img/trash.svg" width="16" alt="pause icon" data-playerId="${player.id}/>
+          </a>
