@@ -2608,7 +2608,7 @@ class HtmlBuilder {
       })
       .join("");
     return `
-      <div class= "op-container d-flex flex-column gap-1 borders rounded p-1">
+      <div class= "op-container d-flex flex-column gap-1 borders rounded p-1" data-opId="${op.id}">
       <div  class="d-flex justify-content-between op-header py-1">
         <div class="d-flex flex-column gap-1">
           <div class="h5  p-2 m-0">Foreman: ${op.fleetLeader}</div>
@@ -2647,12 +2647,12 @@ class HtmlBuilder {
     const playerWorkTime = player.characters.map((char) => char.workTime()).reduce((acc, cur) => acc + cur, 0);
     const characterHtml = player.characters
       .map((character) => {
-        return this._characterHtml(character, player.id);
+        return this._characterHtml(character);
       })
       .join(" ");
     return {
       html: `
-  <div class="container-fluid borders d-flex flex-column rounded py-1 player-container">
+  <div class="container-fluid borders d-flex flex-column rounded py-1 player-container" data-playerId="${player.id}">
     <div class="row d-flex flex-column gap-1 pb-1">
       <div class="d-flex justify-content-between">
         <div class="d-flex gap-3">
@@ -2661,7 +2661,7 @@ class HtmlBuilder {
         </div>
         <div class="d-flex gap-2">
       <a href="#">
-        <img src="./img/plus.svg" width="16" alt="plus icon" data-playerId="${player.id}">
+        <img src="./img/plus.svg" width="16" alt="plus icon" >
       </a>
       <a href="#">
         <img src="./img/pause.svg" width="16" alt="pause icon"  />
@@ -2685,16 +2685,16 @@ class HtmlBuilder {
       playerWorkTime,
     };
   }
-  _characterHtml(character, playerId) {
+  _characterHtml(character) {
     return `
-  <div class="d-flex justify-content-between borders rounded p-1">
+  <div class="d-flex justify-content-between borders rounded p-1 character-container" data-characterId="${character.id}">
     <div>Character: ${character.characterName}</div>
     <div class="d-flex gap-2" >
-      <a class="char-pause-btn" href="#" data-characterId="${character.id}" data-playerId="${playerId}">
+      <a class="char-pause-btn" href="#"">
         <img src="./img/${character.isActive ? "pause" : "play"}.svg" width="12" alt="pause icon" />
       </a>
       <div>Work-Time: ${this._formatTime(character.workTime())}</div>
-      <a href="#" class="char-delete-btn" data-characterId="${character.id}" data-playerId="${playerId}">
+      <a href="#" class="char-delete-btn">
         <img src="./img/trash.svg" width="12" alt="pause icon" />
       </a>
     </div>
@@ -2729,6 +2729,7 @@ class MiningOp {
     this.htmlBuilder = new HtmlBuilder();
     this.isActive = false;
     this.id = self.crypto.randomUUID();
+    console.log(this.id);
   }
   buildHtml() {
     return this.htmlBuilder.opHtml(this);

@@ -11,6 +11,7 @@ class MiningOp {
     this.htmlBuilder = new HtmlBuilder();
     this.isActive = false;
     this.id = self.crypto.randomUUID();
+    console.log(this.id);
   }
   buildHtml() {
     return this.htmlBuilder.opHtml(this);
