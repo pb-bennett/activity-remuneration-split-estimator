@@ -48,6 +48,8 @@ $(document).ready(function () {
       opId: $(event.target).closest(".op-container")[0].dataset.opid,
       playerId: $(event.target).closest(".player-container")[0].dataset.playerid,
     };
+    miningOp.pausePlayer(btnEventObj);
+    $("#mainContainer").html(miningOp.buildHtml());
   });
   // CHARACTER PAUSE BUTTON HANDLING
   $("body").on("click", ".character-pause-btn *", (event) => {
@@ -57,6 +59,9 @@ $(document).ready(function () {
       playerId: $(event.target).closest(".player-container")[0].dataset.playerid,
       characterId: $(event.target).closest(".character-container")[0].dataset.characterid,
     };
+
+    miningOp.pauseCharacter(btnEventObj);
+    $("#mainContainer").html(miningOp.buildHtml());
   });
   // DELETE HANDLING
   // OP DELETE BUTTON HANDLING
@@ -131,3 +136,55 @@ $(document).ready(function () {
     $("#mainContainer").html(miningOp.buildHtml());
   });
 });
+
+// Sample pairs of Date objects
+const datePairs = [
+  { start: new Date("2024-03-10T08:00:00"), end: new Date("2024-03-10T12:00:00") },
+  { start: new Date("2024-03-09T15:00:00"), end: new Date("2024-03-09T18:00:00") },
+  { start: new Date("2024-03-11T10:00:00"), end: new Date("2024-03-12T14:00:00") },
+  { start: new Date("2024-03-11T10:00:00"), end: new Date("2024-03-16T14:00:00") },
+  { start: new Date("2024-03-08T10:00:00"), end: new Date("2024-03-11T14:00:00") },
+  { start: new Date("2024-03-15T10:00:00"), end: new Date("2024-03-23T14:00:00") },
+
+  // Add more pairs as needed
+];
+
+// Sort date pairs by start dates
+datePairs.sort((a, b) => a.start - b.start);
+
+// Function to check for overlaps or gaps between pairs
+function findOverlapsAndGaps(datePairs) {
+  let overlaps = [];
+  let gaps = [];
+
+  for (let i = 1; i < datePairs.length; i++) {
+    const currentPair = datePairs[i];
+    const previousPair = datePairs[i - 1];
+
+    if (currentPair.start < previousPair.end) {
+      // Overlap found
+      overlaps.push({
+        overlapStart: currentPair.start,
+        overlapEnd: new Date(Math.min(currentPair.end, previousPair.end)),
+      });
+    } else {
+      // Gap found
+      gaps.push({
+        gapStart: previousPair.end,
+        gapEnd: currentPair.start,
+      });
+    }
+  }
+
+  return { overlaps, gaps };
+}
+
+// Find overlaps and gaps
+const { overlaps, gaps } = findOverlapsAndGaps(datePairs);
+
+// Output the results
+console.log("Overlaps:");
+overlaps.forEach((overlap) => console.log(`${overlap.overlapStart} - ${overlap.overlapEnd}`));
+
+console.log("\nGaps:");
+gaps.forEach((gap) => console.log(`${gap.gapStart} - ${gap.gapEnd}`));

@@ -2559,26 +2559,33 @@ class Character {
   constructor(characterName) {
     this.characterName = characterName;
     this.isActive = false;
+    this.hasBeenActive = false;
+    this.forcePause = false;
     this.activityPeriods = [];
     this.joinTime = new Date();
     this.periodStartTime = null;
     this.id = v4();
   }
   pause() {
-    this.active = false;
+    this.isActive = false;
     this.activityPeriods = [...this.activityPeriods, [this.periodStartTime, new Date()]];
+    this.periodStartTime = null;
   }
   unpause() {
-    this.active = true;
+    console.log("unpausing", this.characterName);
+    this.isActive = true;
+    this.hasBeenActive = true;
     this.periodStartTime = new Date();
   }
   workTime() {
     const timeNow = new Date();
-    if (this.activityPeriods.length === 0) return timeNow - this.joinTime;
+    if (!this.hasBeenActive) return 0;
+    if (this.activityPeriods.length === 0) return timeNow - this.periodStartTime;
     let totalWorkTime = 0;
     this.activityPeriods.forEach((activityPeriod) => {
       totalWorkTime += activityPeriod[1] - activityPeriod[0];
     });
+    if (this.periodStartTime) totalWorkTime += timeNow - this.periodStartTime;
     return totalWorkTime;
   }
 }
@@ -2601,12 +2608,25 @@ class Player {
     console.log("deleting", characterId);
     this.characters = this.characters.filter((character) => character.id !== characterId);
   }
+  pause() {
+    console.log("pausing", this.playerName);
+    this.isActive = false;
+    this.characters.forEach((character) => {
+      if (character.isActive) {
+        character.pause();
+        character.forePause = true;
+      }
+      if (!character.isActive) ;
+    });
+  }
 }
 
 class HtmlBuilder {
   constructor() {}
   opHtml(op) {
     let opWorkTime = 0;
+    const maxWorkTime = op.playerMembers.map((player) => player.characters.map((character) => character.workTime()).reduce((acc, cur) => Math.max(acc, cur), 0)).reduce((acc, cur) => Math.max(acc, cur), 0);
+
     const playersHtml = op.playerMembers
       .map((player) => {
         const playerHtmlObj = this._playerHtmlObj(player);
@@ -2635,7 +2655,7 @@ class HtmlBuilder {
             <img src="./img/${op.isActive ? "pause" : "play"}.svg" width="36" alt="pause icon">
           </a>
           <div class="d-flex flex-column gap-1">
-            <div>Duration: 63 mins</div>
+            <div>Operation Up-Time: ${this._formatTime(maxWorkTime)}</div>
             <div>Operation Work-Time: ${this._formatTime(opWorkTime)}</div>
           </div>
           <a href="#" class="op-delete-btn">
@@ -2667,15 +2687,15 @@ class HtmlBuilder {
           <div class="fs-6">Characters in fleet: ${player.characters.length}</div>
         </div>
         <div class="d-flex gap-2">
-      <a href="#" class="player-add-btn">
-        <img src="./img/plus.svg" width="16" alt="plus icon" >
+      <a href="#" class="player-add-btn p-1">
+        <img src="./img/plus.svg" width="18" alt="plus icon" >
       </a>
-      <a href="#" class="player-pause-btn">
-        <img src="./img/pause.svg" width="16" alt="pause icon"  />
+      <a href="#" class="player-pause-btn p-1">
+        <img src="./img/pause.svg" width="18" alt="pause icon"  />
       </a>
       <div>Player Work-Time: ${this._formatTime(playerWorkTime)}</div>
-      <a href="#" class="player-delete-btn">
-        <img src="./img/trash.svg" width="16" alt="pause icon" />
+      <a href="#" class="player-delete-btn p-1">
+        <img src="./img/trash.svg" width="18" alt="pause icon" />
       </a>
         </div>
       </div>
@@ -2697,12 +2717,12 @@ class HtmlBuilder {
   <div class="d-flex justify-content-between borders rounded p-1 character-container" data-characterId="${character.id}">
     <div>Character: ${character.characterName}</div>
     <div class="d-flex gap-2" >
-      <a class="character-pause-btn" href="#"">
-        <img src="./img/${character.isActive ? "pause" : "play"}.svg" width="12" alt="pause icon" />
+      <a class="character-pause-btn p-1" href="#"">
+        <img src="./img/${character.isActive ? "pause" : "play"}.svg" width="18" alt="pause icon" />
       </a>
       <div>Work-Time: ${this._formatTime(character.workTime())}</div>
-      <a href="#" class="character-delete-btn">
-        <img src="./img/trash.svg" width="12" alt="pause icon" />
+      <a href="#" class="character-delete-btn p-1">
+        <img src="./img/trash.svg" width="18" alt="pause icon" />
       </a>
     </div>
   </div>
@@ -2761,6 +2781,12 @@ class MiningOp {
       this.deletePlayer(btnEventObj.playerId);
     }
   }
+  pausePlayer(btnEventObj) {}
+  pauseCharacter(btnEventObj) {
+    const characterToPause = this.getCharacter(btnEventObj);
+    if (characterToPause.isActive) return characterToPause.pause();
+    characterToPause.unpause();
+  }
 }
 
 const datePickerOptions = {
@@ -2813,20 +2839,25 @@ $(document).ready(function () {
   });
   // PLAYER PAUSE BUTTON HANDLING
   $("body").on("click", ".player-pause-btn *", (event) => {
-    ({
+    const btnEventObj = {
       type: "player-pause",
       opId: $(event.target).closest(".op-container")[0].dataset.opid,
       playerId: $(event.target).closest(".player-container")[0].dataset.playerid,
-    });
+    };
+    miningOp.pausePlayer(btnEventObj);
+    $("#mainContainer").html(miningOp.buildHtml());
   });
   // CHARACTER PAUSE BUTTON HANDLING
   $("body").on("click", ".character-pause-btn *", (event) => {
-    ({
+    const btnEventObj = {
       type: "character-pause",
       opId: $(event.target).closest(".op-container")[0].dataset.opid,
       playerId: $(event.target).closest(".player-container")[0].dataset.playerid,
       characterId: $(event.target).closest(".character-container")[0].dataset.characterid,
-    });
+    };
+
+    miningOp.pauseCharacter(btnEventObj);
+    $("#mainContainer").html(miningOp.buildHtml());
   });
   // DELETE HANDLING
   // OP DELETE BUTTON HANDLING
@@ -2901,3 +2932,55 @@ $(document).ready(function () {
     $("#mainContainer").html(miningOp.buildHtml());
   });
 });
+
+// Sample pairs of Date objects
+const datePairs = [
+  { start: new Date("2024-03-10T08:00:00"), end: new Date("2024-03-10T12:00:00") },
+  { start: new Date("2024-03-09T15:00:00"), end: new Date("2024-03-09T18:00:00") },
+  { start: new Date("2024-03-11T10:00:00"), end: new Date("2024-03-12T14:00:00") },
+  { start: new Date("2024-03-11T10:00:00"), end: new Date("2024-03-16T14:00:00") },
+  { start: new Date("2024-03-08T10:00:00"), end: new Date("2024-03-11T14:00:00") },
+  { start: new Date("2024-03-15T10:00:00"), end: new Date("2024-03-23T14:00:00") },
+
+  // Add more pairs as needed
+];
+
+// Sort date pairs by start dates
+datePairs.sort((a, b) => a.start - b.start);
+
+// Function to check for overlaps or gaps between pairs
+function findOverlapsAndGaps(datePairs) {
+  let overlaps = [];
+  let gaps = [];
+
+  for (let i = 1; i < datePairs.length; i++) {
+    const currentPair = datePairs[i];
+    const previousPair = datePairs[i - 1];
+
+    if (currentPair.start < previousPair.end) {
+      // Overlap found
+      overlaps.push({
+        overlapStart: currentPair.start,
+        overlapEnd: new Date(Math.min(currentPair.end, previousPair.end)),
+      });
+    } else {
+      // Gap found
+      gaps.push({
+        gapStart: previousPair.end,
+        gapEnd: currentPair.start,
+      });
+    }
+  }
+
+  return { overlaps, gaps };
+}
+
+// Find overlaps and gaps
+const { overlaps, gaps } = findOverlapsAndGaps(datePairs);
+
+// Output the results
+console.log("Overlaps:");
+overlaps.forEach((overlap) => console.log(`${overlap.overlapStart} - ${overlap.overlapEnd}`));
+
+console.log("\nGaps:");
+gaps.forEach((gap) => console.log(`${gap.gapStart} - ${gap.gapEnd}`));

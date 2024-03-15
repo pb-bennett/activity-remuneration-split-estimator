@@ -36,6 +36,12 @@ class MiningOp {
       this.deletePlayer(btnEventObj.playerId);
     }
   }
+  pausePlayer(btnEventObj) {}
+  pauseCharacter(btnEventObj) {
+    const characterToPause = this.getCharacter(btnEventObj);
+    if (characterToPause.isActive) return characterToPause.pause();
+    characterToPause.unpause();
+  }
 }
 
 export default MiningOp;

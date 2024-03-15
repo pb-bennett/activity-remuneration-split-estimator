@@ -20,6 +20,18 @@ class Player {
     console.log("deleting", characterId);
     this.characters = this.characters.filter((character) => character.id !== characterId);
   }
+  pause() {
+    console.log("pausing", this.playerName);
+    this.isActive = false;
+    this.characters.forEach((character) => {
+      if (character.isActive) {
+        character.pause();
+        character.forePause = true;
+      }
+      if (!character.isActive) {
+      }
+    });
+  }
 }
 
 export default Player;
