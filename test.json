@@ -1,0 +1,16 @@
+{
+  "fleetLeader": "Bob Eagle",
+  "fleetName": "Eagle Fleet",
+  "startTime": "2024-03-14T20:43:00.000Z",
+  "playerMembers": [
+    {
+      "playerName": "Bob Eagle",
+      "characters": [{ "characterName": "Bob Eagle", "isActive": false, "activityPeriods": [], "joinTime": "2024-03-14T20:43:18.375Z", "periodStartTime": null, "id": "80eaf317-9ba0-4843-9384-3862c6427914" }],
+      "isActive": false,
+      "id": "7d82a667-f6f8-48bb-9b2a-1c9e1e6b521b"
+    }
+  ],
+  "htmlBuilder": {},
+  "isActive": false,
+  "id": "379ec055-e92a-4236-b4e5-d30e8acb81fa"
+}

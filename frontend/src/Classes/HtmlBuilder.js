@@ -1,22 +1,25 @@
 class HtmlBuilder {
   constructor() {}
   opHtml(op) {
-    const playerHtml = op.playerMembers
+    let opWorkTime = 0;
+    const playersHtml = op.playerMembers
       .map((player) => {
-        return this._playerHtml(player);
+        const playerHtmlObj = this._playerHtmlObj(player);
+        opWorkTime = opWorkTime += playerHtmlObj.playerWorkTime;
+        return playerHtmlObj.html;
       })
       .join("");
     return `
-  
-      <div id="opHeader" class="d-flex justify-content-between p-2 borders rounded">
+      <div class= "op-container d-flex flex-column gap-1 borders rounded p-1">
+      <div  class="d-flex justify-content-between op-header py-1">
         <div class="d-flex flex-column gap-1">
-          <div class="h5 borders rounded p-2 m-0">Foreman: ${op.fleetLeader}</div>
-          <div class="fs-6 borders rounded px-2 py-0 m-0 d-flex justify-content-between">
+          <div class="h5  p-2 m-0">Foreman: ${op.fleetLeader}</div>
+          <div class="fs-6  px-2 py-0 m-0 d-flex justify-content-between">
             <div>Started: </div>
             <div>${op.startTime.toLocaleTimeString("en-GB", { timeZone: "Atlantic/Reykjavik", year: "numeric", month: "long", day: "numeric" })}</div>
           </div>
         </div>
-        <div class="h5 borders rounded p-2 m-0 d-flex flex-column justify-content-center">
+        <div class="h5  p-2 m-0 d-flex flex-column justify-content-center">
           <div class="px-4">${op.fleetName}</div>
         </div>
         <div class="d-flex gap-4 align-items-center">
@@ -28,25 +31,30 @@ class HtmlBuilder {
           </a>
           <div class="d-flex flex-column gap-1">
             <div>Duration: 63 mins</div>
-            <div>Operation Work-Time: 01:04:01</div>
+            <div>Operation Work-Time: ${this._formatTime(opWorkTime)}</div>
           </div>
           <a href="#">
             <img src="./img/trash.svg" width="36" alt="pause icon">
           </a>
         </div>
         </div>
-        ${playerHtml}
+        <div class="players-container d-flex flex-column gap-1 p-1">
+        ${playersHtml}
+        </div>
+        </div>
   
     `;
   }
-  _playerHtml(player) {
+  _playerHtmlObj(player) {
+    const playerWorkTime = player.characters.map((char) => char.workTime()).reduce((acc, cur) => acc + cur, 0);
     const characterHtml = player.characters
       .map((character) => {
         return this._characterHtml(character, player.id);
       })
       .join(" ");
-    return `
-  <div id="opContainer" class="container-fluid borders d-flex flex-column rounded">
+    return {
+      html: `
+  <div class="container-fluid borders d-flex flex-column rounded py-1 player-container">
     <div class="row d-flex flex-column gap-1 pb-1">
       <div class="d-flex justify-content-between">
         <div class="d-flex gap-3">
@@ -54,13 +62,13 @@ class HtmlBuilder {
           <div class="fs-6">Characters in fleet: ${player.characters.length}</div>
         </div>
         <div class="d-flex gap-2">
-        <a href="#">
-        <img src="./img/plus.svg" width="16" alt="pause icon" data-playerId="${player.id}>
+      <a href="#">
+        <img src="./img/plus.svg" width="16" alt="plus icon" data-playerId="${player.id}">
       </a>
-        <a href="#">
+      <a href="#">
         <img src="./img/pause.svg" width="16" alt="pause icon"  />
       </a>
-      <div>Player Work-Time: 01:04:01</div>
+      <div>Player Work-Time: ${this._formatTime(playerWorkTime)}</div>
       <a href="#">
         <img src="./img/trash.svg" width="16" alt="pause icon" />
       </a>
@@ -69,9 +77,15 @@ class HtmlBuilder {
       <div class="d-flex flex-column gap-1">
       </div>
       </div>
+      <div>
+      </div>
+      <div class="characters-container d-flex flex-column gap-1">
       ${characterHtml}
+      </div>
   </div>
-    `;
+    `,
+      playerWorkTime,
+    };
   }
   _characterHtml(character, playerId) {
     return `

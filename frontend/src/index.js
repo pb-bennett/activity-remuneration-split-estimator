@@ -9,14 +9,18 @@ $(document).ready(function () {
   $("#newFleetForm").on("submit", (event) => {
     event.preventDefault();
     if (!miningOp) miningOp = new MiningOp($("#fleetLeaderInput").val(), $("#fleetNameInput").val(), $("#datepicker").val());
+    miningOp.addPlayerMember("Kyira");
+    miningOp.playerMembers.filter((p) => p.playerName === "Kyira")[0].addCharacter("Kahraan");
     $(newFleetModal).modal("hide");
     $("#newFleetModalBtn").prop("disabled", true);
     $("#showDetails").prop("disabled", false);
-    console.log(miningOp.buildHtml());
+    // console.log(miningOp.buildHtml());
     $("#mainContainer").html(miningOp.buildHtml());
-    setInterval(() => {
-      $("#mainContainer").html(miningOp.buildHtml());
-    }, 1000);
+    const miningOpJson = JSON.stringify(miningOp);
+    console.log(miningOpJson);
+    // setInterval(() => {
+    //   $("#mainContainer").html(miningOp.buildHtml());
+    // }, 1000);
   });
   flatpickr("#datepicker", datePickerOptions);
   $("#showDetails")
