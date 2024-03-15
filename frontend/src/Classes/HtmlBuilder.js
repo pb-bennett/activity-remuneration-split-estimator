@@ -23,17 +23,17 @@ class HtmlBuilder {
           <div class="px-4">${op.fleetName}</div>
         </div>
         <div class="d-flex gap-4 align-items-center">
-          <a href="#">
+          <a href="#" class="op-add-btn">
             <img src="./img/plus.svg" width="36" alt="pause icon">
           </a>
-          <a href="#">
+          <a href="#" class="op-pause-btn">
             <img src="./img/${op.isActive ? "pause" : "play"}.svg" width="36" alt="pause icon">
           </a>
           <div class="d-flex flex-column gap-1">
             <div>Duration: 63 mins</div>
             <div>Operation Work-Time: ${this._formatTime(opWorkTime)}</div>
           </div>
-          <a href="#">
+          <a href="#" class="op-delete-btn">
             <img src="./img/trash.svg" width="36" alt="pause icon">
           </a>
         </div>
@@ -62,14 +62,14 @@ class HtmlBuilder {
           <div class="fs-6">Characters in fleet: ${player.characters.length}</div>
         </div>
         <div class="d-flex gap-2">
-      <a href="#">
+      <a href="#" class="player-add-btn">
         <img src="./img/plus.svg" width="16" alt="plus icon" >
       </a>
-      <a href="#">
+      <a href="#" class="player-pause-btn">
         <img src="./img/pause.svg" width="16" alt="pause icon"  />
       </a>
       <div>Player Work-Time: ${this._formatTime(playerWorkTime)}</div>
-      <a href="#">
+      <a href="#" class="player-delete-btn">
         <img src="./img/trash.svg" width="16" alt="pause icon" />
       </a>
         </div>
@@ -92,11 +92,11 @@ class HtmlBuilder {
   <div class="d-flex justify-content-between borders rounded p-1 character-container" data-characterId="${character.id}">
     <div>Character: ${character.characterName}</div>
     <div class="d-flex gap-2" >
-      <a class="char-pause-btn" href="#"">
+      <a class="character-pause-btn" href="#"">
         <img src="./img/${character.isActive ? "pause" : "play"}.svg" width="12" alt="pause icon" />
       </a>
       <div>Work-Time: ${this._formatTime(character.workTime())}</div>
-      <a href="#" class="char-delete-btn">
+      <a href="#" class="character-delete-btn">
         <img src="./img/trash.svg" width="12" alt="pause icon" />
       </a>
     </div>

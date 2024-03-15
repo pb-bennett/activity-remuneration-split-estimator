@@ -11,7 +11,6 @@ class MiningOp {
     this.htmlBuilder = new HtmlBuilder();
     this.isActive = false;
     this.id = self.crypto.randomUUID();
-    console.log(this.id);
   }
   buildHtml() {
     return this.htmlBuilder.opHtml(this);
@@ -21,6 +20,21 @@ class MiningOp {
   }
   addPlayerMember(player) {
     this.playerMembers.push(new Player(player));
+  }
+  getPlayer(playerId) {
+    return this.playerMembers.filter((player) => player.id === playerId)[0];
+  }
+  deletePlayer(playerId) {
+    this.playerMembers = this.playerMembers.filter((player) => player.id !== playerId);
+  }
+  getCharacter(btnEventObj) {
+    return this.getPlayer(btnEventObj.playerId).getCharacter(btnEventObj.characterId);
+  }
+  deleteCharacter(btnEventObj) {
+    this.getPlayer(btnEventObj.playerId).deleteCharacter(btnEventObj.characterId);
+    if (this.getPlayer(btnEventObj.playerId).characters.length === 0) {
+      this.deletePlayer(btnEventObj.playerId);
+    }
   }
 }
 

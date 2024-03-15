@@ -13,6 +13,13 @@ class Player {
   addCharacter(character) {
     this.characters.push(new Character(character));
   }
+  getCharacter(characterId) {
+    return this.characters.filter((character) => character.id === characterId)[0];
+  }
+  deleteCharacter(characterId) {
+    console.log("deleting", characterId);
+    this.characters = this.characters.filter((character) => character.id !== characterId);
+  }
 }
 
 export default Player;

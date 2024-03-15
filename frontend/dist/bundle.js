@@ -2594,6 +2594,13 @@ class Player {
   addCharacter(character) {
     this.characters.push(new Character(character));
   }
+  getCharacter(characterId) {
+    return this.characters.filter((character) => character.id === characterId)[0];
+  }
+  deleteCharacter(characterId) {
+    console.log("deleting", characterId);
+    this.characters = this.characters.filter((character) => character.id !== characterId);
+  }
 }
 
 class HtmlBuilder {
@@ -2621,17 +2628,17 @@ class HtmlBuilder {
           <div class="px-4">${op.fleetName}</div>
         </div>
         <div class="d-flex gap-4 align-items-center">
-          <a href="#">
+          <a href="#" class="op-add-btn">
             <img src="./img/plus.svg" width="36" alt="pause icon">
           </a>
-          <a href="#">
+          <a href="#" class="op-pause-btn">
             <img src="./img/${op.isActive ? "pause" : "play"}.svg" width="36" alt="pause icon">
           </a>
           <div class="d-flex flex-column gap-1">
             <div>Duration: 63 mins</div>
             <div>Operation Work-Time: ${this._formatTime(opWorkTime)}</div>
           </div>
-          <a href="#">
+          <a href="#" class="op-delete-btn">
             <img src="./img/trash.svg" width="36" alt="pause icon">
           </a>
         </div>
@@ -2660,14 +2667,14 @@ class HtmlBuilder {
           <div class="fs-6">Characters in fleet: ${player.characters.length}</div>
         </div>
         <div class="d-flex gap-2">
-      <a href="#">
+      <a href="#" class="player-add-btn">
         <img src="./img/plus.svg" width="16" alt="plus icon" >
       </a>
-      <a href="#">
+      <a href="#" class="player-pause-btn">
         <img src="./img/pause.svg" width="16" alt="pause icon"  />
       </a>
       <div>Player Work-Time: ${this._formatTime(playerWorkTime)}</div>
-      <a href="#">
+      <a href="#" class="player-delete-btn">
         <img src="./img/trash.svg" width="16" alt="pause icon" />
       </a>
         </div>
@@ -2690,11 +2697,11 @@ class HtmlBuilder {
   <div class="d-flex justify-content-between borders rounded p-1 character-container" data-characterId="${character.id}">
     <div>Character: ${character.characterName}</div>
     <div class="d-flex gap-2" >
-      <a class="char-pause-btn" href="#"">
+      <a class="character-pause-btn" href="#"">
         <img src="./img/${character.isActive ? "pause" : "play"}.svg" width="12" alt="pause icon" />
       </a>
       <div>Work-Time: ${this._formatTime(character.workTime())}</div>
-      <a href="#" class="char-delete-btn">
+      <a href="#" class="character-delete-btn">
         <img src="./img/trash.svg" width="12" alt="pause icon" />
       </a>
     </div>
@@ -2729,7 +2736,6 @@ class MiningOp {
     this.htmlBuilder = new HtmlBuilder();
     this.isActive = false;
     this.id = self.crypto.randomUUID();
-    console.log(this.id);
   }
   buildHtml() {
     return this.htmlBuilder.opHtml(this);
@@ -2739,6 +2745,21 @@ class MiningOp {
   }
   addPlayerMember(player) {
     this.playerMembers.push(new Player(player));
+  }
+  getPlayer(playerId) {
+    return this.playerMembers.filter((player) => player.id === playerId)[0];
+  }
+  deletePlayer(playerId) {
+    this.playerMembers = this.playerMembers.filter((player) => player.id !== playerId);
+  }
+  getCharacter(btnEventObj) {
+    return this.getPlayer(btnEventObj.playerId).getCharacter(btnEventObj.characterId);
+  }
+  deleteCharacter(btnEventObj) {
+    this.getPlayer(btnEventObj.playerId).deleteCharacter(btnEventObj.characterId);
+    if (this.getPlayer(btnEventObj.playerId).characters.length === 0) {
+      this.deletePlayer(btnEventObj.playerId);
+    }
   }
 }
 
@@ -2753,23 +2774,25 @@ const datePickerOptions = {
 };
 
 let miningOp;
+let refreshInterval;
 
 $(document).ready(function () {
   $("#newFleetForm").on("submit", (event) => {
     event.preventDefault();
-    if (!miningOp) miningOp = new MiningOp($("#fleetLeaderInput").val(), $("#fleetNameInput").val(), $("#datepicker").val());
+
+    if (!miningOp?.fleetName) miningOp = new MiningOp($("#fleetLeaderInput").val(), $("#fleetNameInput").val(), $("#datepicker").val());
+    clearInterval(refreshInterval);
     miningOp.addPlayerMember("Kyira");
     miningOp.playerMembers.filter((p) => p.playerName === "Kyira")[0].addCharacter("Kahraan");
     $(newFleetModal).modal("hide");
     $("#newFleetModalBtn").prop("disabled", true);
     $("#showDetails").prop("disabled", false);
-    // console.log(miningOp.buildHtml());
     $("#mainContainer").html(miningOp.buildHtml());
-    const miningOpJson = JSON.stringify(miningOp);
-    console.log(miningOpJson);
-    // setInterval(() => {
-    //   $("#mainContainer").html(miningOp.buildHtml());
-    // }, 1000);
+    JSON.stringify(miningOp);
+
+    refreshInterval = setInterval(() => {
+      if (miningOp.fleetName) $("#mainContainer").html(miningOp.buildHtml());
+    }, 1000);
   });
   flatpickr("#datepicker", datePickerOptions);
   $("#showDetails")
@@ -2778,4 +2801,103 @@ $(document).ready(function () {
       if (miningOp) miningOp.showDetails();
       console.log(miningOp);
     });
+
+  // PAUSE BUTTON HANDLING
+  // PAUSE HANDLING
+  // OP PAUSE BUTTON HANDLING
+  $("body").on("click", ".op-pause-btn *", (event) => {
+    ({
+      type: "op-pause",
+      opId: $(event.target).closest(".op-container")[0].dataset.opid,
+    });
+  });
+  // PLAYER PAUSE BUTTON HANDLING
+  $("body").on("click", ".player-pause-btn *", (event) => {
+    ({
+      type: "player-pause",
+      opId: $(event.target).closest(".op-container")[0].dataset.opid,
+      playerId: $(event.target).closest(".player-container")[0].dataset.playerid,
+    });
+  });
+  // CHARACTER PAUSE BUTTON HANDLING
+  $("body").on("click", ".character-pause-btn *", (event) => {
+    ({
+      type: "character-pause",
+      opId: $(event.target).closest(".op-container")[0].dataset.opid,
+      playerId: $(event.target).closest(".player-container")[0].dataset.playerid,
+      characterId: $(event.target).closest(".character-container")[0].dataset.characterid,
+    });
+  });
+  // DELETE HANDLING
+  // OP DELETE BUTTON HANDLING
+  $("body").on("click", ".op-delete-btn *", (event) => {
+    ({
+      type: "op-delete",
+      opId: $(event.target).closest(".op-container")[0].dataset.opid,
+    });
+    const confirmation = confirm(`Are you sure you want to delete ${miningOp.fleetName}?`);
+    if (confirmation) {
+      miningOp = {};
+      $("#newFleetModalBtn").prop("disabled", false);
+      $("#showDetails").prop("disabled", true);
+    }
+    $("#mainContainer").html("");
+  });
+  // PLAYER DELETE BUTTON HANDLING
+  $("body").on("click", ".player-delete-btn *", (event) => {
+    const btnEventObj = {
+      type: "player-delete",
+      opId: $(event.target).closest(".op-container")[0].dataset.opid,
+      playerId: $(event.target).closest(".player-container")[0].dataset.playerid,
+    };
+    const playerToDelete = miningOp.getPlayer(btnEventObj.playerId);
+    console.log(playerToDelete);
+    const confirmation = confirm(`Are you sure you want to delete Player ${playerToDelete.playerName}?`);
+    if (confirmation) {
+      miningOp.deletePlayer(btnEventObj.playerId);
+      $("#mainContainer").html(miningOp.buildHtml());
+    }
+  });
+  // CHARACTER DELETE BUTTON HANDLING
+  $("body").on("click", ".character-delete-btn *", (event) => {
+    const btnEventObj = {
+      type: "character-delete",
+      opId: $(event.target).closest(".op-container")[0].dataset.opid,
+      playerId: $(event.target).closest(".player-container")[0].dataset.playerid,
+      characterId: $(event.target).closest(".character-container")[0].dataset.characterid,
+    };
+
+    const characterToDelete = miningOp.getCharacter(btnEventObj);
+    console.log(characterToDelete);
+    const confirmation = confirm(`Are you sure you want to delete Character ${characterToDelete.characterName}?`);
+    if (confirmation) {
+      miningOp.deleteCharacter(btnEventObj);
+      $("#mainContainer").html(miningOp.buildHtml());
+    }
+  });
+  // ADD HANDLING
+  // OP  ADD HANDLING
+  $("body").on("click", ".op-add-btn *", (event) => {
+    ({
+      type: "player-add",
+      opId: $(event.target).closest(".op-container")[0].dataset.opid,
+    });
+    const newPlayer = prompt("Enter player name", "Newbie Jake");
+    if (!newPlayer) return;
+    miningOp.addPlayerMember(newPlayer);
+    $("#mainContainer").html(miningOp.buildHtml());
+  });
+  // PLAYER  ADD HANDLING
+  $("body").on("click", ".player-add-btn *", (event) => {
+    const btnEventObj = {
+      type: "character-add",
+      opId: $(event.target).closest(".op-container")[0].dataset.opid,
+      playerId: $(event.target).closest(".player-container")[0].dataset.playerid,
+    };
+    const newCharacter = prompt("Enter character name", "Jake's alt");
+    if (!newCharacter) return;
+    const selectedPlayer = miningOp.getPlayer(btnEventObj.playerId);
+    selectedPlayer.addCharacter(newCharacter);
+    $("#mainContainer").html(miningOp.buildHtml());
+  });
 });
