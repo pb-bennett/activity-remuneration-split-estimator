@@ -36,11 +36,34 @@ class MiningOp {
       this.deletePlayer(btnEventObj.playerId);
     }
   }
-  pausePlayer(btnEventObj) {}
+  pause() {
+    if (this.isActive) {
+      this.playerMembers.forEach((player) => player.pause());
+      this.isActive = !this.isActive;
+      return;
+    }
+    this.playerMembers.forEach((player) => player.unpause());
+    this.isActive = !this.isActive;
+  }
+  pausePlayer(btnEventObj) {
+    const playerToPause = this.getPlayer(btnEventObj.playerId);
+    if (playerToPause.isActive) return playerToPause.pause();
+    playerToPause.unpause();
+  }
+
+  //Toggles pause - should rename function
   pauseCharacter(btnEventObj) {
     const characterToPause = this.getCharacter(btnEventObj);
-    if (characterToPause.isActive) return characterToPause.pause();
+    const playerToPause = this.getPlayer(btnEventObj.playerId);
+    // pausing character if is active
+    if (characterToPause.isActive) {
+      characterToPause.pause();
+      //check if player has other characters that are active, if false pause character also
+      !playerToPause.characters.filter((character) => character.isActive).length > 0 ? (playerToPause.isActive = false) : (playerToPause.isActive = true);
+      return;
+    }
     characterToPause.unpause();
+    playerToPause.isActive = true;
   }
 }
 

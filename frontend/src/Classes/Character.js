@@ -13,23 +13,29 @@ class Character {
   }
   pause() {
     this.isActive = false;
-    this.activityPeriods = [...this.activityPeriods, [this.periodStartTime, new Date()]];
+    this.activityPeriods = [...this.activityPeriods, { periodStart: this.periodStartTime, periodEnd: new Date() }];
     this.periodStartTime = null;
+    console.log("pausing", this.characterName, this.activityPeriods, "Force Pause:", this.forcePause, "Is Active:", this.isActive);
   }
   unpause() {
-    console.log("unpausing", this.characterName);
     this.isActive = true;
     this.hasBeenActive = true;
+    this.forcePause = false;
     this.periodStartTime = new Date();
+    console.log("unpausing", this.characterName, this.activityPeriods, "Force Pause:", this.forcePause, "Is Active:", this.isActive);
   }
   workTime() {
     const timeNow = new Date();
+    //If the character has not been activated ever in the current op return 0
     if (!this.hasBeenActive) return 0;
+    //If the character has not been paused before but is active return the current time period only
     if (this.activityPeriods.length === 0) return timeNow - this.periodStartTime;
     let totalWorkTime = 0;
+    //Sums all activity periods for the character
     this.activityPeriods.forEach((activityPeriod) => {
-      totalWorkTime += activityPeriod[1] - activityPeriod[0];
+      totalWorkTime += activityPeriod.periodEnd - activityPeriod.periodStart;
     });
+    //Adding the current time period if character is unpaused
     if (this.periodStartTime) totalWorkTime += timeNow - this.periodStartTime;
     return totalWorkTime;
   }

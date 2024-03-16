@@ -40,6 +40,7 @@ $(document).ready(function () {
       type: "op-pause",
       opId: $(event.target).closest(".op-container")[0].dataset.opid,
     };
+    miningOp.pause();
   });
   // PLAYER PAUSE BUTTON HANDLING
   $("body").on("click", ".player-pause-btn *", (event) => {

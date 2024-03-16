@@ -2568,23 +2568,29 @@ class Character {
   }
   pause() {
     this.isActive = false;
-    this.activityPeriods = [...this.activityPeriods, [this.periodStartTime, new Date()]];
+    this.activityPeriods = [...this.activityPeriods, { periodStart: this.periodStartTime, periodEnd: new Date() }];
     this.periodStartTime = null;
+    console.log("pausing", this.characterName, this.activityPeriods, "Force Pause:", this.forcePause, "Is Active:", this.isActive);
   }
   unpause() {
-    console.log("unpausing", this.characterName);
     this.isActive = true;
     this.hasBeenActive = true;
+    this.forcePause = false;
     this.periodStartTime = new Date();
+    console.log("unpausing", this.characterName, this.activityPeriods, "Force Pause:", this.forcePause, "Is Active:", this.isActive);
   }
   workTime() {
     const timeNow = new Date();
+    //If the character has not been activated ever in the current op return 0
     if (!this.hasBeenActive) return 0;
+    //If the character has not been paused before but is active return the current time period only
     if (this.activityPeriods.length === 0) return timeNow - this.periodStartTime;
     let totalWorkTime = 0;
+    //Sums all activity periods for the character
     this.activityPeriods.forEach((activityPeriod) => {
-      totalWorkTime += activityPeriod[1] - activityPeriod[0];
+      totalWorkTime += activityPeriod.periodEnd - activityPeriod.periodStart;
     });
+    //Adding the current time period if character is unpaused
     if (this.periodStartTime) totalWorkTime += timeNow - this.periodStartTime;
     return totalWorkTime;
   }
@@ -2609,14 +2615,23 @@ class Player {
     this.characters = this.characters.filter((character) => character.id !== characterId);
   }
   pause() {
-    console.log("pausing", this.playerName);
+    console.log("pausing player", this.playerName);
     this.isActive = false;
     this.characters.forEach((character) => {
       if (character.isActive) {
         character.pause();
-        character.forePause = true;
+        character.forcePause = true;
+        console.log("pausing", character.characterName, character.activityPeriods, "Force Pause:", character.forcePause, "Is Active:", character.isActive);
       }
-      if (!character.isActive) ;
+    });
+  }
+  unpause() {
+    console.log("unpausing player", this.playerName);
+    this.isActive = true;
+    this.characters.forEach((character) => {
+      if (character.forcePause || !character.hasBeenActive) {
+        character.unpause();
+      }
     });
   }
 }
@@ -2691,7 +2706,7 @@ class HtmlBuilder {
         <img src="./img/plus.svg" width="18" alt="plus icon" >
       </a>
       <a href="#" class="player-pause-btn p-1">
-        <img src="./img/pause.svg" width="18" alt="pause icon"  />
+        <img src="./img/${player.isActive ? "pause" : "play"}.svg" width="18" alt="pause icon"  />
       </a>
       <div>Player Work-Time: ${this._formatTime(playerWorkTime)}</div>
       <a href="#" class="player-delete-btn p-1">
@@ -2781,11 +2796,34 @@ class MiningOp {
       this.deletePlayer(btnEventObj.playerId);
     }
   }
-  pausePlayer(btnEventObj) {}
+  pause() {
+    if (this.isActive) {
+      this.playerMembers.forEach((player) => player.pause());
+      this.isActive = !this.isActive;
+      return;
+    }
+    this.playerMembers.forEach((player) => player.unpause());
+    this.isActive = !this.isActive;
+  }
+  pausePlayer(btnEventObj) {
+    const playerToPause = this.getPlayer(btnEventObj.playerId);
+    if (playerToPause.isActive) return playerToPause.pause();
+    playerToPause.unpause();
+  }
+
+  //Toggles pause - should rename function
   pauseCharacter(btnEventObj) {
     const characterToPause = this.getCharacter(btnEventObj);
-    if (characterToPause.isActive) return characterToPause.pause();
+    const playerToPause = this.getPlayer(btnEventObj.playerId);
+    // pausing character if is active
+    if (characterToPause.isActive) {
+      characterToPause.pause();
+      //check if player has other characters that are active, if false pause character also
+      !playerToPause.characters.filter((character) => character.isActive).length > 0 ? (playerToPause.isActive = false) : (playerToPause.isActive = true);
+      return;
+    }
     characterToPause.unpause();
+    playerToPause.isActive = true;
   }
 }
 
@@ -2836,6 +2874,7 @@ $(document).ready(function () {
       type: "op-pause",
       opId: $(event.target).closest(".op-container")[0].dataset.opid,
     });
+    miningOp.pause();
   });
   // PLAYER PAUSE BUTTON HANDLING
   $("body").on("click", ".player-pause-btn *", (event) => {

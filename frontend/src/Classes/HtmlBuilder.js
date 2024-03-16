@@ -68,7 +68,7 @@ class HtmlBuilder {
         <img src="./img/plus.svg" width="18" alt="plus icon" >
       </a>
       <a href="#" class="player-pause-btn p-1">
-        <img src="./img/pause.svg" width="18" alt="pause icon"  />
+        <img src="./img/${player.isActive ? "pause" : "play"}.svg" width="18" alt="pause icon"  />
       </a>
       <div>Player Work-Time: ${this._formatTime(playerWorkTime)}</div>
       <a href="#" class="player-delete-btn p-1">

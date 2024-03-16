@@ -21,14 +21,22 @@ class Player {
     this.characters = this.characters.filter((character) => character.id !== characterId);
   }
   pause() {
-    console.log("pausing", this.playerName);
+    console.log("pausing player", this.playerName);
     this.isActive = false;
     this.characters.forEach((character) => {
       if (character.isActive) {
         character.pause();
-        character.forePause = true;
+        character.forcePause = true;
+        console.log("pausing", character.characterName, character.activityPeriods, "Force Pause:", character.forcePause, "Is Active:", character.isActive);
       }
-      if (!character.isActive) {
+    });
+  }
+  unpause() {
+    console.log("unpausing player", this.playerName);
+    this.isActive = true;
+    this.characters.forEach((character) => {
+      if (character.forcePause || !character.hasBeenActive) {
+        character.unpause();
       }
     });
   }
