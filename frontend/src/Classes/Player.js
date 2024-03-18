@@ -1,14 +1,14 @@
-import { v4 as uuidv4 } from "https://jspm.dev/uuid";
+// import { v4 as uuidv4 } from "https://jspm.dev/uuid";
 
 import Character from "./Character.js";
 
 class Player {
-  constructor(playerName) {
+  constructor(playerName, reload = false) {
     this.playerName = playerName;
     this.characters = [];
-    this.addCharacter(playerName);
+    if (!reload) this.addCharacter(playerName);
     this.isActive = false;
-    this.id = uuidv4();
+    this.id = self.crypto.randomUUID();
   }
   addCharacter(character) {
     this.characters.push(new Character(character));

@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "https://jspm.dev/uuid";
+// import { v4 as uuidv4 } from "https://jspm.dev/uuid";
 
 class Character {
   constructor(characterName) {
@@ -9,7 +9,7 @@ class Character {
     this.activityPeriods = [];
     this.joinTime = new Date();
     this.periodStartTime = null;
-    this.id = uuidv4();
+    this.id = self.crypto.randomUUID();
   }
   pause() {
     this.isActive = false;

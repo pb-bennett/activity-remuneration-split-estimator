@@ -2,7 +2,11 @@ class HtmlBuilder {
   constructor() {}
   opHtml(op) {
     let opWorkTime = 0;
-    const maxWorkTime = op.playerMembers.map((player) => player.characters.map((character) => character.workTime()).reduce((acc, cur) => Math.max(acc, cur), 0)).reduce((acc, cur) => Math.max(acc, cur), 0);
+    // const workTimeArray = op.playerMembers.map((player) => {
+    //   return player.characters.map((character) => character.workTime());
+    // });
+    // const upTime = this._findOverlapsAndGaps(workTimeArray);
+    // console.log(upTime);
 
     const playersHtml = op.playerMembers
       .map((player) => {
@@ -12,7 +16,7 @@ class HtmlBuilder {
       })
       .join("");
     return `
-      <div class= "op-container d-flex flex-column gap-1 borders rounded p-1" data-opId="${op.id}">
+      <div class= "op-container d-flex flex-column gap-1 borders rounded p-1 overflow-auto" data-opId="${op.id}">
       <div  class="d-flex justify-content-between op-header py-1">
         <div class="d-flex flex-column gap-1">
           <div class="h5  p-2 m-0">Foreman: ${op.fleetLeader}</div>
@@ -32,7 +36,7 @@ class HtmlBuilder {
             <img src="./img/${op.isActive ? "pause" : "play"}.svg" width="36" alt="pause icon">
           </a>
           <div class="d-flex flex-column gap-1">
-            <div>Operation Up-Time: ${this._formatTime(maxWorkTime)}</div>
+           
             <div>Operation Work-Time: ${this._formatTime(opWorkTime)}</div>
           </div>
           <a href="#" class="op-delete-btn">
@@ -40,7 +44,7 @@ class HtmlBuilder {
           </a>
         </div>
         </div>
-        <div class="players-container d-flex flex-column gap-1 p-1">
+        <div class="players-container d-flex flex-column gap-1 p-1 ">
         ${playersHtml}
         </div>
         </div>
@@ -121,6 +125,31 @@ class HtmlBuilder {
 
     return formattedTime;
   }
+  // _findOverlapsAndGaps(datePairs) {
+  //   let overlaps = [];
+  //   let gaps = [];
+
+  //   for (let i = 1; i < datePairs.length; i++) {
+  //     const currentPair = datePairs[i];
+  //     const previousPair = datePairs[i - 1];
+
+  //     if (currentPair.start < previousPair.end) {
+  //       // Overlap found
+  //       overlaps.push({
+  //         overlapStart: currentPair.start,
+  //         overlapEnd: new Date(Math.min(currentPair.end, previousPair.end)),
+  //       });
+  //     } else {
+  //       // Gap found
+  //       gaps.push({
+  //         gapStart: previousPair.end,
+  //         gapEnd: currentPair.start,
+  //       });
+  //     }
+  //   }
+
+  //   return { overlaps, gaps };
+  // }
 }
 
 export default HtmlBuilder;

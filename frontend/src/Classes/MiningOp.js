@@ -1,19 +1,19 @@
 import Player from "./Player.js";
+import Character from "./Character.js";
 import HtmlBuilder from "./HtmlBuilder.js";
+import SplitOp from "./SplitOp.js";
 
 class MiningOp {
-  constructor(fleetLeader, fleetName, startTime) {
+  constructor(fleetLeader, fleetName, startTime, reload = false) {
     this.fleetLeader = fleetLeader;
     this.fleetName = fleetName;
     this.startTime = new Date(startTime);
     this.playerMembers = [];
-    this.addPlayerMember(fleetLeader);
+    if (!reload) this.addPlayerMember(fleetLeader);
     this.htmlBuilder = new HtmlBuilder();
     this.isActive = false;
     this.id = self.crypto.randomUUID();
-  }
-  buildHtml() {
-    return this.htmlBuilder.opHtml(this);
+    this.splitOp = new SplitOp();
   }
   showDetails() {
     console.log(this.fleetLeader, this.fleetName, this.startTime);
@@ -64,6 +64,35 @@ class MiningOp {
     }
     characterToPause.unpause();
     playerToPause.isActive = true;
+  }
+  buildHtml() {
+    return this.htmlBuilder.opHtml(this);
+  }
+  split() {
+    return this.splitOp.split(this);
+  }
+  static loadMiningOp(parsedMiningOp) {
+    const miningOp = new MiningOp(parsedMiningOp.fleetLeader, parsedMiningOp.fleetName, parsedMiningOp.startTime, true);
+    miningOp.playerMembers = parsedMiningOp.playerMembers.map((playerData) => {
+      const player = new Player(playerData.playerName, true);
+      player.characters = playerData.characters.map((characterData) => {
+        const character = new Character(characterData.characterName);
+        character.isActive = characterData.isActive;
+        character.hasBeenActive = characterData.hasBeenActive;
+        character.forcePause = characterData.forcePause;
+        character.activityPeriods = characterData.activityPeriods;
+        character.joinTime = new Date(characterData.joinTime);
+        character.periodStartTime = new Date(characterData.periodStartTime) || null;
+        character.id = characterData.id;
+        return character;
+      });
+      player.isActive = playerData.isActive;
+      player.id = playerData.id;
+      return player;
+    });
+    miningOp.isActive = parsedMiningOp.isActive;
+    miningOp.id = parsedMiningOp.id;
+    return miningOp;
   }
 }
 

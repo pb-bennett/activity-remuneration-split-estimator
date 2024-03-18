@@ -1,5 +1,3 @@
-import { v4 } from 'https://jspm.dev/uuid';
-
 var HOOKS = [
     "onChange",
     "onClose",
@@ -2555,6 +2553,8 @@ if (typeof window !== "undefined") {
     window.flatpickr = flatpickr;
 }
 
+// import { v4 as uuidv4 } from "https://jspm.dev/uuid";
+
 class Character {
   constructor(characterName) {
     this.characterName = characterName;
@@ -2564,7 +2564,7 @@ class Character {
     this.activityPeriods = [];
     this.joinTime = new Date();
     this.periodStartTime = null;
-    this.id = v4();
+    this.id = self.crypto.randomUUID();
   }
   pause() {
     this.isActive = false;
@@ -2596,13 +2596,16 @@ class Character {
   }
 }
 
+// import { v4 as uuidv4 } from "https://jspm.dev/uuid";
+
+
 class Player {
-  constructor(playerName) {
+  constructor(playerName, reload = false) {
     this.playerName = playerName;
     this.characters = [];
-    this.addCharacter(playerName);
+    if (!reload) this.addCharacter(playerName);
     this.isActive = false;
-    this.id = v4();
+    this.id = self.crypto.randomUUID();
   }
   addCharacter(character) {
     this.characters.push(new Character(character));
@@ -2640,7 +2643,11 @@ class HtmlBuilder {
   constructor() {}
   opHtml(op) {
     let opWorkTime = 0;
-    const maxWorkTime = op.playerMembers.map((player) => player.characters.map((character) => character.workTime()).reduce((acc, cur) => Math.max(acc, cur), 0)).reduce((acc, cur) => Math.max(acc, cur), 0);
+    // const workTimeArray = op.playerMembers.map((player) => {
+    //   return player.characters.map((character) => character.workTime());
+    // });
+    // const upTime = this._findOverlapsAndGaps(workTimeArray);
+    // console.log(upTime);
 
     const playersHtml = op.playerMembers
       .map((player) => {
@@ -2650,7 +2657,7 @@ class HtmlBuilder {
       })
       .join("");
     return `
-      <div class= "op-container d-flex flex-column gap-1 borders rounded p-1" data-opId="${op.id}">
+      <div class= "op-container d-flex flex-column gap-1 borders rounded p-1 overflow-auto" data-opId="${op.id}">
       <div  class="d-flex justify-content-between op-header py-1">
         <div class="d-flex flex-column gap-1">
           <div class="h5  p-2 m-0">Foreman: ${op.fleetLeader}</div>
@@ -2670,7 +2677,7 @@ class HtmlBuilder {
             <img src="./img/${op.isActive ? "pause" : "play"}.svg" width="36" alt="pause icon">
           </a>
           <div class="d-flex flex-column gap-1">
-            <div>Operation Up-Time: ${this._formatTime(maxWorkTime)}</div>
+           
             <div>Operation Work-Time: ${this._formatTime(opWorkTime)}</div>
           </div>
           <a href="#" class="op-delete-btn">
@@ -2678,7 +2685,7 @@ class HtmlBuilder {
           </a>
         </div>
         </div>
-        <div class="players-container d-flex flex-column gap-1 p-1">
+        <div class="players-container d-flex flex-column gap-1 p-1 ">
         ${playersHtml}
         </div>
         </div>
@@ -2759,21 +2766,64 @@ class HtmlBuilder {
 
     return formattedTime;
   }
+  // _findOverlapsAndGaps(datePairs) {
+  //   let overlaps = [];
+  //   let gaps = [];
+
+  //   for (let i = 1; i < datePairs.length; i++) {
+  //     const currentPair = datePairs[i];
+  //     const previousPair = datePairs[i - 1];
+
+  //     if (currentPair.start < previousPair.end) {
+  //       // Overlap found
+  //       overlaps.push({
+  //         overlapStart: currentPair.start,
+  //         overlapEnd: new Date(Math.min(currentPair.end, previousPair.end)),
+  //       });
+  //     } else {
+  //       // Gap found
+  //       gaps.push({
+  //         gapStart: previousPair.end,
+  //         gapEnd: currentPair.start,
+  //       });
+  //     }
+  //   }
+
+  //   return { overlaps, gaps };
+  // }
+}
+
+class SplitOp {
+  split(miningOp) {
+    const playerWorkTimes = miningOp.playerMembers.map((player) => {
+      return {
+        player: player.playerName,
+        characterWorkTimes: player.characters.map((char) => {
+          return { characterName: char.characterName, workTime: char.workTime() };
+        }),
+        playerWorkTime: player.characters.map((char) => char.workTime()).reduce((acc, cur) => acc + cur, 0),
+      };
+    });
+
+    // const
+
+    return {
+      playerWorkTimes,
+    };
+  }
 }
 
 class MiningOp {
-  constructor(fleetLeader, fleetName, startTime) {
+  constructor(fleetLeader, fleetName, startTime, reload = false) {
     this.fleetLeader = fleetLeader;
     this.fleetName = fleetName;
     this.startTime = new Date(startTime);
     this.playerMembers = [];
-    this.addPlayerMember(fleetLeader);
+    if (!reload) this.addPlayerMember(fleetLeader);
     this.htmlBuilder = new HtmlBuilder();
     this.isActive = false;
     this.id = self.crypto.randomUUID();
-  }
-  buildHtml() {
-    return this.htmlBuilder.opHtml(this);
+    this.splitOp = new SplitOp();
   }
   showDetails() {
     console.log(this.fleetLeader, this.fleetName, this.startTime);
@@ -2825,6 +2875,35 @@ class MiningOp {
     characterToPause.unpause();
     playerToPause.isActive = true;
   }
+  buildHtml() {
+    return this.htmlBuilder.opHtml(this);
+  }
+  split() {
+    return this.splitOp.split(this);
+  }
+  static loadMiningOp(parsedMiningOp) {
+    const miningOp = new MiningOp(parsedMiningOp.fleetLeader, parsedMiningOp.fleetName, parsedMiningOp.startTime, true);
+    miningOp.playerMembers = parsedMiningOp.playerMembers.map((playerData) => {
+      const player = new Player(playerData.playerName, true);
+      player.characters = playerData.characters.map((characterData) => {
+        const character = new Character(characterData.characterName);
+        character.isActive = characterData.isActive;
+        character.hasBeenActive = characterData.hasBeenActive;
+        character.forcePause = characterData.forcePause;
+        character.activityPeriods = characterData.activityPeriods;
+        character.joinTime = new Date(characterData.joinTime);
+        character.periodStartTime = new Date(characterData.periodStartTime) || null;
+        character.id = characterData.id;
+        return character;
+      });
+      player.isActive = playerData.isActive;
+      player.id = playerData.id;
+      return player;
+    });
+    miningOp.isActive = parsedMiningOp.isActive;
+    miningOp.id = parsedMiningOp.id;
+    return miningOp;
+  }
 }
 
 const datePickerOptions = {
@@ -2846,13 +2925,14 @@ $(document).ready(function () {
 
     if (!miningOp?.fleetName) miningOp = new MiningOp($("#fleetLeaderInput").val(), $("#fleetNameInput").val(), $("#datepicker").val());
     clearInterval(refreshInterval);
-    miningOp.addPlayerMember("Kyira");
-    miningOp.playerMembers.filter((p) => p.playerName === "Kyira")[0].addCharacter("Kahraan");
+    // miningOp.addPlayerMember("Kyira");
+    // miningOp.playerMembers.filter((p) => p.playerName === "Kyira")[0].addCharacter("Kahraan");
     $(newFleetModal).modal("hide");
     $("#newFleetModalBtn").prop("disabled", true);
     $("#showDetails").prop("disabled", false);
     $("#mainContainer").html(miningOp.buildHtml());
-    JSON.stringify(miningOp);
+    const miningOpJson = JSON.stringify(miningOp);
+    console.log(miningOpJson);
 
     refreshInterval = setInterval(() => {
       if (miningOp.fleetName) $("#mainContainer").html(miningOp.buildHtml());
@@ -2860,10 +2940,11 @@ $(document).ready(function () {
   });
   flatpickr("#datepicker", datePickerOptions);
   $("#showDetails")
-    .prop("disabled", true)
+    // .prop("disabled", true)
     .on("click", (event) => {
-      if (miningOp) miningOp.showDetails();
-      console.log(miningOp);
+      // if (miningOp) miningOp.showDetails();
+      // console.log(miningOp);
+      console.log(miningOp.split());
     });
 
   // PAUSE BUTTON HANDLING
@@ -2952,7 +3033,7 @@ $(document).ready(function () {
       type: "player-add",
       opId: $(event.target).closest(".op-container")[0].dataset.opid,
     });
-    const newPlayer = prompt("Enter player name", "Newbie Jake");
+    const newPlayer = prompt("Enter player name");
     if (!newPlayer) return;
     miningOp.addPlayerMember(newPlayer);
     $("#mainContainer").html(miningOp.buildHtml());
@@ -2964,62 +3045,69 @@ $(document).ready(function () {
       opId: $(event.target).closest(".op-container")[0].dataset.opid,
       playerId: $(event.target).closest(".player-container")[0].dataset.playerid,
     };
-    const newCharacter = prompt("Enter character name", "Jake's alt");
+    const newCharacter = prompt("Enter character name");
     if (!newCharacter) return;
     const selectedPlayer = miningOp.getPlayer(btnEventObj.playerId);
     selectedPlayer.addCharacter(newCharacter);
     $("#mainContainer").html(miningOp.buildHtml());
   });
+  miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
+  $("#mainContainer").html(miningOp.buildHtml());
+  // refreshInterval = setInterval(() => {
+  //   if (miningOp.fleetName) $("#mainContainer").html(miningOp.buildHtml());
+  // }, 1000);
 });
 
 // Sample pairs of Date objects
-const datePairs = [
-  { start: new Date("2024-03-10T08:00:00"), end: new Date("2024-03-10T12:00:00") },
-  { start: new Date("2024-03-09T15:00:00"), end: new Date("2024-03-09T18:00:00") },
-  { start: new Date("2024-03-11T10:00:00"), end: new Date("2024-03-12T14:00:00") },
-  { start: new Date("2024-03-11T10:00:00"), end: new Date("2024-03-16T14:00:00") },
-  { start: new Date("2024-03-08T10:00:00"), end: new Date("2024-03-11T14:00:00") },
-  { start: new Date("2024-03-15T10:00:00"), end: new Date("2024-03-23T14:00:00") },
+// const datePairs = [
+//   { start: new Date("2024-03-10T08:00:00"), end: new Date("2024-03-10T12:00:00") },
+//   { start: new Date("2024-03-09T15:00:00"), end: new Date("2024-03-09T18:00:00") },
+//   { start: new Date("2024-03-11T10:00:00"), end: new Date("2024-03-12T14:00:00") },
+//   { start: new Date("2024-03-11T10:00:00"), end: new Date("2024-03-16T14:00:00") },
+//   { start: new Date("2024-03-08T10:00:00"), end: new Date("2024-03-11T14:00:00") },
+//   { start: new Date("2024-03-15T10:00:00"), end: new Date("2024-03-23T14:00:00") },
 
-  // Add more pairs as needed
-];
+//   // Add more pairs as needed
+// ];
 
-// Sort date pairs by start dates
-datePairs.sort((a, b) => a.start - b.start);
+// // Sort date pairs by start dates
+// datePairs.sort((a, b) => a.start - b.start);
 
-// Function to check for overlaps or gaps between pairs
-function findOverlapsAndGaps(datePairs) {
-  let overlaps = [];
-  let gaps = [];
+// // Function to check for overlaps or gaps between pairs
+// function findOverlapsAndGaps(datePairs) {
+//   let overlaps = [];
+//   let gaps = [];
 
-  for (let i = 1; i < datePairs.length; i++) {
-    const currentPair = datePairs[i];
-    const previousPair = datePairs[i - 1];
+//   for (let i = 1; i < datePairs.length; i++) {
+//     const currentPair = datePairs[i];
+//     const previousPair = datePairs[i - 1];
 
-    if (currentPair.start < previousPair.end) {
-      // Overlap found
-      overlaps.push({
-        overlapStart: currentPair.start,
-        overlapEnd: new Date(Math.min(currentPair.end, previousPair.end)),
-      });
-    } else {
-      // Gap found
-      gaps.push({
-        gapStart: previousPair.end,
-        gapEnd: currentPair.start,
-      });
-    }
-  }
+//     if (currentPair.start < previousPair.end) {
+//       // Overlap found
+//       overlaps.push({
+//         overlapStart: currentPair.start,
+//         overlapEnd: new Date(Math.min(currentPair.end, previousPair.end)),
+//       });
+//     } else {
+//       // Gap found
+//       gaps.push({
+//         gapStart: previousPair.end,
+//         gapEnd: currentPair.start,
+//       });
+//     }
+//   // }
 
-  return { overlaps, gaps };
-}
+//   return { overlaps, gaps };
+// }
 
 // Find overlaps and gaps
-const { overlaps, gaps } = findOverlapsAndGaps(datePairs);
+// const { overlaps, gaps } = findOverlapsAndGaps(datePairs);
 
 // Output the results
-console.log("Overlaps:");
-overlaps.forEach((overlap) => console.log(`${overlap.overlapStart} - ${overlap.overlapEnd}`));
+// console.log("Overlaps:");
+// overlaps.forEach((overlap) => console.log(`${overlap.overlapStart} - ${overlap.overlapEnd}`));
 
-console.log("\nGaps:");
-gaps.forEach((gap) => console.log(`${gap.gapStart} - ${gap.gapEnd}`));
+// console.log("\nGaps:");
+// gaps.forEach((gap) => console.log(`${gap.gapStart} - ${gap.gapEnd}`));
+
+const opJSON = `{"fleetLeader":"Bob Eagle","fleetName":"Eagle Fleet","startTime":"2024-03-16T13:44:00.000Z","playerMembers":[{"playerName":"Bob Eagle","characters":[{"characterName":"Bob Eagle","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"154f8a7a-4ae9-4d77-972f-ecc73708eb0d"}],"isActive":false,"id":"ad20d3c0-9b93-434a-ac4e-505ebf0f391b"},{"playerName":"Kyira","characters":[{"characterName":"Kyira","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"505d826a-dd79-4e2e-a54e-6d00924ce1fe"},{"characterName":"Kahraan","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"457a7fa5-3ffc-45af-a4af-79e5b383c4f9"}],"isActive":false,"id":"e551cb55-2e51-4cf5-a99f-fed33d871ae9"}],"htmlBuilder":{},"isActive":false,"id":"9bcaa53d-302b-4ce2-8381-1b510b29b2e1"}`;

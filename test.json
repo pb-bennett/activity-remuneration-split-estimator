@@ -1,16 +1,27 @@
 {
   "fleetLeader": "Bob Eagle",
   "fleetName": "Eagle Fleet",
-  "startTime": "2024-03-14T20:43:00.000Z",
+  "startTime": "2024-03-16T13:41:00.000Z",
   "playerMembers": [
     {
       "playerName": "Bob Eagle",
-      "characters": [{ "characterName": "Bob Eagle", "isActive": false, "activityPeriods": [], "joinTime": "2024-03-14T20:43:18.375Z", "periodStartTime": null, "id": "80eaf317-9ba0-4843-9384-3862c6427914" }],
+      "characters": [
+        { "characterName": "Bob Eagle", "isActive": false, "hasBeenActive": false, "forcePause": false, "activityPeriods": [], "joinTime": "2024-03-16T13:41:10.120Z", "periodStartTime": null, "id": "93013007-4f0e-4d80-9a82-91706235897e" }
+      ],
       "isActive": false,
-      "id": "7d82a667-f6f8-48bb-9b2a-1c9e1e6b521b"
+      "id": "a089f211-1ede-411e-9356-619e76064bb0"
+    },
+    {
+      "playerName": "Kyira",
+      "characters": [
+        { "characterName": "Kyira", "isActive": false, "hasBeenActive": false, "forcePause": false, "activityPeriods": [], "joinTime": "2024-03-16T13:41:10.120Z", "periodStartTime": null, "id": "30c1a625-dc25-4d3e-8804-7ee6dbbd9f2f" },
+        { "characterName": "Kahraan", "isActive": false, "hasBeenActive": false, "forcePause": false, "activityPeriods": [], "joinTime": "2024-03-16T13:41:10.120Z", "periodStartTime": null, "id": "66a6475c-a031-47cf-b90e-3bcb0bc7516b" }
+      ],
+      "isActive": false,
+      "id": "5c243a51-e070-4f21-924d-bbc0515636e9"
     }
   ],
   "htmlBuilder": {},
   "isActive": false,
-  "id": "379ec055-e92a-4236-b4e5-d30e8acb81fa"
+  "id": "016b9907-d21e-4866-9925-95c6e28483a6"
 }
