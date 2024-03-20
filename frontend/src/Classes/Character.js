@@ -15,14 +15,12 @@ class Character {
     this.isActive = false;
     this.activityPeriods = [...this.activityPeriods, { periodStart: this.periodStartTime, periodEnd: new Date() }];
     this.periodStartTime = null;
-    console.log("pausing", this.characterName, this.activityPeriods, "Force Pause:", this.forcePause, "Is Active:", this.isActive);
   }
   unpause() {
     this.isActive = true;
     this.hasBeenActive = true;
     this.forcePause = false;
     this.periodStartTime = new Date();
-    console.log("unpausing", this.characterName, this.activityPeriods, "Force Pause:", this.forcePause, "Is Active:", this.isActive);
   }
   workTime() {
     const timeNow = new Date();

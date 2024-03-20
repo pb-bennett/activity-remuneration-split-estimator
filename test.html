@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container-fluid borders d-flex flex-column rounded py-1 player-container" data-playerId="${player.id}">
+      <div class="row d-flex flex-column gap-1 pb-1">
+        <div class="d-flex justify-content-between">
+          <div class="d-flex gap-3 align-items-center">
+            <a href="#" class="ars-btn player-edit-btn p-1 player-btn" data-btnScope="character" data-btnType="edit">
+              <img src="./img/edit.svg" alt="edit icon" />
+            </a>
+            <div class="fs-6">Player: ${player.playerName}</div>
+            <div class="fs-6">Characters in fleet: ${player.characters.length}</div>
+          </div>
+          <div class="d-flex gap-2 align-items-center">
+            <a href="#" class="ars-btn player-add-btn p-1 player-btn" data-btnScope="player" data-btnType="add">
+              <img src="./img/plus.svg" alt="plus icon" />
+            </a>
+            <a href="#" class="ars-btn player-pause-btn p-1 player-btn" data-btnScope="player" data-btnType="pause"> <img src="./img/${player.isActive ? "pause" : "play"}.svg" alt="pause icon" /> </a>
+            <div>Player Work-Time: ${this._formatTime(playerWorkTime)}</div>
+            <a href="#" class="ars-btn player-delete-btn p-1 player-btn">
+              <img src="./img/trash.svg" alt="delete icon" data-btnScope="player" data-btnType="delete" />
+            </a>
+          </div>
+        </div>
+        <div class="characters-container d-flex flex-column gap-1">${characterHtml}</div>
+      </div>
+    </div>
+  </body>
+</html>

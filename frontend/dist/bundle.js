@@ -2570,14 +2570,12 @@ class Character {
     this.isActive = false;
     this.activityPeriods = [...this.activityPeriods, { periodStart: this.periodStartTime, periodEnd: new Date() }];
     this.periodStartTime = null;
-    console.log("pausing", this.characterName, this.activityPeriods, "Force Pause:", this.forcePause, "Is Active:", this.isActive);
   }
   unpause() {
     this.isActive = true;
     this.hasBeenActive = true;
     this.forcePause = false;
     this.periodStartTime = new Date();
-    console.log("unpausing", this.characterName, this.activityPeriods, "Force Pause:", this.forcePause, "Is Active:", this.isActive);
   }
   workTime() {
     const timeNow = new Date();
@@ -2614,22 +2612,18 @@ class Player {
     return this.characters.filter((character) => character.id === characterId)[0];
   }
   deleteCharacter(characterId) {
-    console.log("deleting", characterId);
     this.characters = this.characters.filter((character) => character.id !== characterId);
   }
   pause() {
-    console.log("pausing player", this.playerName);
     this.isActive = false;
     this.characters.forEach((character) => {
       if (character.isActive) {
         character.pause();
         character.forcePause = true;
-        console.log("pausing", character.characterName, character.activityPeriods, "Force Pause:", character.forcePause, "Is Active:", character.isActive);
       }
     });
   }
   unpause() {
-    console.log("unpausing player", this.playerName);
     this.isActive = true;
     this.characters.forEach((character) => {
       if (character.forcePause || !character.hasBeenActive) {
@@ -2643,12 +2637,6 @@ class HtmlBuilder {
   constructor() {}
   opHtml(op) {
     let opWorkTime = 0;
-    // const workTimeArray = op.playerMembers.map((player) => {
-    //   return player.characters.map((character) => character.workTime());
-    // });
-    // const upTime = this._findOverlapsAndGaps(workTimeArray);
-    // console.log(upTime);
-
     const playersHtml = op.playerMembers
       .map((player) => {
         const playerHtmlObj = this._playerHtmlObj(player);
@@ -2657,39 +2645,41 @@ class HtmlBuilder {
       })
       .join("");
     return `
-      <div class= "op-container d-flex flex-column gap-1 borders rounded p-1 overflow-auto" data-opId="${op.id}">
-      <div  class="d-flex justify-content-between op-header py-1">
+    <div class="op-container d-flex flex-column gap-1 borders rounded p-1 overflow-auto" data-opId="${op.id}">
+      <div class="d-flex justify-content-between op-header py-1 px-2 align-items-center">
+        <a href="#" class="ars-btn op-edit-btn p-1 op-btn" data-btnScope="op" data-btnType="edit">
+          <img src="./img/edit.svg" alt="edit icon" />
+        </a>
         <div class="d-flex flex-column gap-1">
-          <div class="h5  p-2 m-0">Foreman: ${op.fleetLeader}</div>
-          <div class="fs-6  px-2 py-0 m-0 d-flex justify-content-between">
-            <div>Started: </div>
+          <div class="h5 p-2 m-0">Foreman: ${op.fleetLeader}</div>
+          <div class="fs-6 px-2 py-0 m-0 d-flex justify-content-between">
+            <div>Started:</div>
             <div>${op.startTime.toLocaleTimeString("en-GB", { timeZone: "Atlantic/Reykjavik", year: "numeric", month: "long", day: "numeric" })}</div>
           </div>
         </div>
-        <div class="h5  p-2 m-0 d-flex flex-column justify-content-center">
+        <div class="h5 p-2 m-0 d-flex justify-content-center align-items-center">
           <div class="px-4">${op.fleetName}</div>
+          <a href="#" class="ars-btn op-split-btn p-1 op-btn" data-btnScope="op" data-btnType="split">
+            <img src="./img/split2.svg" alt="split icon" />
+          </a>
         </div>
         <div class="d-flex gap-4 align-items-center">
-          <a href="#" class="op-add-btn">
-            <img src="./img/plus.svg" width="36" alt="pause icon">
+          <a href="#" class="ars-btn op-add-btn op-btn2">
+            <img src="./img/plus.svg"  alt="add icon" data-btnScope="op" data-btnType="add" />
           </a>
-          <a href="#" class="op-pause-btn">
-            <img src="./img/${op.isActive ? "pause" : "play"}.svg" width="36" alt="pause icon">
+          <a href="#" class="ars-btn op-pause-btn op-btn2" data-btnScope="op" data-btnType="pause"> 
+            <img src="./img/${op.isActive ? "pause" : "play"}.svg"  alt="pause icon"> 
           </a>
           <div class="d-flex flex-column gap-1">
-           
             <div>Operation Work-Time: ${this._formatTime(opWorkTime)}</div>
           </div>
-          <a href="#" class="op-delete-btn">
-            <img src="./img/trash.svg" width="36" alt="pause icon">
+          <a href="#" class="ars-btn op-delete-btn op-btn2" data-btnScope="op" data-btnType="delete">
+            <img src="./img/trash.svg"  alt="delete icon" />
           </a>
         </div>
-        </div>
-        <div class="players-container d-flex flex-column gap-1 p-1 ">
-        ${playersHtml}
-        </div>
-        </div>
-  
+      </div>
+      <div class="test players-container d-flex flex-column gap-1 p-1">${playersHtml}</div>
+    </div>
     `;
   }
   _playerHtmlObj(player) {
@@ -2701,35 +2691,30 @@ class HtmlBuilder {
       .join(" ");
     return {
       html: `
-  <div class="container-fluid borders d-flex flex-column rounded py-1 player-container" data-playerId="${player.id}">
-    <div class="row d-flex flex-column gap-1 pb-1">
-      <div class="d-flex justify-content-between">
-        <div class="d-flex gap-3">
-          <div class="fs-6">Player: ${player.playerName}</div>
-          <div class="fs-6">Characters in fleet: ${player.characters.length}</div>
+      <div class="container-fluid borders d-flex flex-column rounded py-1 player-container" data-playerId="${player.id}">
+      <div class="row d-flex flex-column gap-1 pb-1">
+        <div class="d-flex justify-content-between">
+          <div class="d-flex gap-3 align-items-center">
+            <a href="#" class="ars-btn player-edit-btn p-1 player-btn" data-btnScope="character" data-btnType="edit">
+              <img src="./img/edit.svg" alt="edit icon" />
+            </a>
+            <div class="fs-6">Player: ${player.playerName}</div>
+            <div class="fs-6">Characters in fleet: ${player.characters.length}</div>
+          </div>
+          <div class="d-flex gap-2 align-items-center">
+            <a href="#" class="ars-btn player-add-btn p-1 player-btn" data-btnScope="player" data-btnType="add">
+              <img src="./img/plus.svg" alt="plus icon" />
+            </a>
+            <a href="#" class="ars-btn player-pause-btn p-1 player-btn" data-btnScope="player" data-btnType="pause"> <img src="./img/${player.isActive ? "pause" : "play"}.svg" alt="pause icon" /> </a>
+            <div>Player Work-Time: ${this._formatTime(playerWorkTime)}</div>
+            <a href="#" class="ars-btn player-delete-btn p-1 player-btn">
+              <img src="./img/trash.svg" alt="delete icon" data-btnScope="player" data-btnType="delete" />
+            </a>
+          </div>
         </div>
-        <div class="d-flex gap-2">
-      <a href="#" class="player-add-btn p-1">
-        <img src="./img/plus.svg" width="18" alt="plus icon" >
-      </a>
-      <a href="#" class="player-pause-btn p-1">
-        <img src="./img/${player.isActive ? "pause" : "play"}.svg" width="18" alt="pause icon"  />
-      </a>
-      <div>Player Work-Time: ${this._formatTime(playerWorkTime)}</div>
-      <a href="#" class="player-delete-btn p-1">
-        <img src="./img/trash.svg" width="18" alt="pause icon" />
-      </a>
-        </div>
+        <div class="characters-container d-flex flex-column gap-1">${characterHtml}</div>
       </div>
-      <div class="d-flex flex-column gap-1">
-      </div>
-      </div>
-      <div>
-      </div>
-      <div class="characters-container d-flex flex-column gap-1">
-      ${characterHtml}
-      </div>
-  </div>
+    </div>
     `,
       playerWorkTime,
     };
@@ -2737,14 +2722,19 @@ class HtmlBuilder {
   _characterHtml(character) {
     return `
   <div class="d-flex justify-content-between borders rounded p-1 character-container" data-characterId="${character.id}">
+    <div class="d-flex gap-2 align-items-center">
+    <a href="#" class="ars-btn character-edit-btn p-1 character-btn" data-btnScope="character" data-btnType="edit">
+    <img src="./img/edit.svg"  alt="pause icon" />
+    </a>  
     <div>Character: ${character.characterName}</div>
-    <div class="d-flex gap-2" >
-      <a class="character-pause-btn p-1" href="#"">
-        <img src="./img/${character.isActive ? "pause" : "play"}.svg" width="18" alt="pause icon" />
+    </div>
+    <div class="d-flex gap-2 align-items-center" >
+      <a class="ars-btn character-pause-btn p-1 character-btn" href="#"" data-btnScope="character" data-btnType="pause">
+        <img src="./img/${character.isActive ? "pause" : "play"}.svg"  alt="pause icon" />
       </a>
       <div>Work-Time: ${this._formatTime(character.workTime())}</div>
-      <a href="#" class="character-delete-btn p-1">
-        <img src="./img/trash.svg" width="18" alt="pause icon" />
+      <a href="#" class="ars-btn character-delete-btn p-1 character-btn" data-btnScope="character" data-btnType="delete">
+        <img src="./img/trash.svg"  alt="pause icon" />
       </a>
     </div>
   </div>
@@ -2766,31 +2756,6 @@ class HtmlBuilder {
 
     return formattedTime;
   }
-  // _findOverlapsAndGaps(datePairs) {
-  //   let overlaps = [];
-  //   let gaps = [];
-
-  //   for (let i = 1; i < datePairs.length; i++) {
-  //     const currentPair = datePairs[i];
-  //     const previousPair = datePairs[i - 1];
-
-  //     if (currentPair.start < previousPair.end) {
-  //       // Overlap found
-  //       overlaps.push({
-  //         overlapStart: currentPair.start,
-  //         overlapEnd: new Date(Math.min(currentPair.end, previousPair.end)),
-  //       });
-  //     } else {
-  //       // Gap found
-  //       gaps.push({
-  //         gapStart: previousPair.end,
-  //         gapEnd: currentPair.start,
-  //       });
-  //     }
-  //   }
-
-  //   return { overlaps, gaps };
-  // }
 }
 
 class SplitOp {
@@ -2931,21 +2896,14 @@ $(document).ready(function () {
     $("#newFleetModalBtn").prop("disabled", true);
     $("#showDetails").prop("disabled", false);
     $("#mainContainer").html(miningOp.buildHtml());
-    const miningOpJson = JSON.stringify(miningOp);
-    console.log(miningOpJson);
+    JSON.stringify(miningOp);
 
     refreshInterval = setInterval(() => {
       if (miningOp.fleetName) $("#mainContainer").html(miningOp.buildHtml());
     }, 1000);
   });
   flatpickr("#datepicker", datePickerOptions);
-  $("#showDetails")
-    // .prop("disabled", true)
-    .on("click", (event) => {
-      // if (miningOp) miningOp.showDetails();
-      // console.log(miningOp);
-      console.log(miningOp.split());
-    });
+  $("#showDetails").on("click", (event) => {});
 
   // PAUSE BUTTON HANDLING
   // PAUSE HANDLING
@@ -3002,7 +2960,6 @@ $(document).ready(function () {
       playerId: $(event.target).closest(".player-container")[0].dataset.playerid,
     };
     const playerToDelete = miningOp.getPlayer(btnEventObj.playerId);
-    console.log(playerToDelete);
     const confirmation = confirm(`Are you sure you want to delete Player ${playerToDelete.playerName}?`);
     if (confirmation) {
       miningOp.deletePlayer(btnEventObj.playerId);
@@ -3017,9 +2974,7 @@ $(document).ready(function () {
       playerId: $(event.target).closest(".player-container")[0].dataset.playerid,
       characterId: $(event.target).closest(".character-container")[0].dataset.characterid,
     };
-
     const characterToDelete = miningOp.getCharacter(btnEventObj);
-    console.log(characterToDelete);
     const confirmation = confirm(`Are you sure you want to delete Character ${characterToDelete.characterName}?`);
     if (confirmation) {
       miningOp.deleteCharacter(btnEventObj);
@@ -3057,57 +3012,5 @@ $(document).ready(function () {
   //   if (miningOp.fleetName) $("#mainContainer").html(miningOp.buildHtml());
   // }, 1000);
 });
-
-// Sample pairs of Date objects
-// const datePairs = [
-//   { start: new Date("2024-03-10T08:00:00"), end: new Date("2024-03-10T12:00:00") },
-//   { start: new Date("2024-03-09T15:00:00"), end: new Date("2024-03-09T18:00:00") },
-//   { start: new Date("2024-03-11T10:00:00"), end: new Date("2024-03-12T14:00:00") },
-//   { start: new Date("2024-03-11T10:00:00"), end: new Date("2024-03-16T14:00:00") },
-//   { start: new Date("2024-03-08T10:00:00"), end: new Date("2024-03-11T14:00:00") },
-//   { start: new Date("2024-03-15T10:00:00"), end: new Date("2024-03-23T14:00:00") },
-
-//   // Add more pairs as needed
-// ];
-
-// // Sort date pairs by start dates
-// datePairs.sort((a, b) => a.start - b.start);
-
-// // Function to check for overlaps or gaps between pairs
-// function findOverlapsAndGaps(datePairs) {
-//   let overlaps = [];
-//   let gaps = [];
-
-//   for (let i = 1; i < datePairs.length; i++) {
-//     const currentPair = datePairs[i];
-//     const previousPair = datePairs[i - 1];
-
-//     if (currentPair.start < previousPair.end) {
-//       // Overlap found
-//       overlaps.push({
-//         overlapStart: currentPair.start,
-//         overlapEnd: new Date(Math.min(currentPair.end, previousPair.end)),
-//       });
-//     } else {
-//       // Gap found
-//       gaps.push({
-//         gapStart: previousPair.end,
-//         gapEnd: currentPair.start,
-//       });
-//     }
-//   // }
-
-//   return { overlaps, gaps };
-// }
-
-// Find overlaps and gaps
-// const { overlaps, gaps } = findOverlapsAndGaps(datePairs);
-
-// Output the results
-// console.log("Overlaps:");
-// overlaps.forEach((overlap) => console.log(`${overlap.overlapStart} - ${overlap.overlapEnd}`));
-
-// console.log("\nGaps:");
-// gaps.forEach((gap) => console.log(`${gap.gapStart} - ${gap.gapEnd}`));
 
 const opJSON = `{"fleetLeader":"Bob Eagle","fleetName":"Eagle Fleet","startTime":"2024-03-16T13:44:00.000Z","playerMembers":[{"playerName":"Bob Eagle","characters":[{"characterName":"Bob Eagle","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"154f8a7a-4ae9-4d77-972f-ecc73708eb0d"}],"isActive":false,"id":"ad20d3c0-9b93-434a-ac4e-505ebf0f391b"},{"playerName":"Kyira","characters":[{"characterName":"Kyira","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"505d826a-dd79-4e2e-a54e-6d00924ce1fe"},{"characterName":"Kahraan","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"457a7fa5-3ffc-45af-a4af-79e5b383c4f9"}],"isActive":false,"id":"e551cb55-2e51-4cf5-a99f-fed33d871ae9"}],"htmlBuilder":{},"isActive":false,"id":"9bcaa53d-302b-4ce2-8381-1b510b29b2e1"}`;

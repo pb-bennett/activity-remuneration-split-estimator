@@ -19,20 +19,13 @@ $(document).ready(function () {
     $("#showDetails").prop("disabled", false);
     $("#mainContainer").html(miningOp.buildHtml());
     const miningOpJson = JSON.stringify(miningOp);
-    console.log(miningOpJson);
 
     refreshInterval = setInterval(() => {
       if (miningOp.fleetName) $("#mainContainer").html(miningOp.buildHtml());
     }, 1000);
   });
   flatpickr("#datepicker", datePickerOptions);
-  $("#showDetails")
-    // .prop("disabled", true)
-    .on("click", (event) => {
-      // if (miningOp) miningOp.showDetails();
-      // console.log(miningOp);
-      console.log(miningOp.split());
-    });
+  $("#showDetails").on("click", (event) => {});
 
   // PAUSE BUTTON HANDLING
   // PAUSE HANDLING
@@ -89,7 +82,6 @@ $(document).ready(function () {
       playerId: $(event.target).closest(".player-container")[0].dataset.playerid,
     };
     const playerToDelete = miningOp.getPlayer(btnEventObj.playerId);
-    console.log(playerToDelete);
     const confirmation = confirm(`Are you sure you want to delete Player ${playerToDelete.playerName}?`);
     if (confirmation) {
       miningOp.deletePlayer(btnEventObj.playerId);
@@ -104,9 +96,7 @@ $(document).ready(function () {
       playerId: $(event.target).closest(".player-container")[0].dataset.playerid,
       characterId: $(event.target).closest(".character-container")[0].dataset.characterid,
     };
-
     const characterToDelete = miningOp.getCharacter(btnEventObj);
-    console.log(characterToDelete);
     const confirmation = confirm(`Are you sure you want to delete Character ${characterToDelete.characterName}?`);
     if (confirmation) {
       miningOp.deleteCharacter(btnEventObj);
@@ -144,57 +134,5 @@ $(document).ready(function () {
   //   if (miningOp.fleetName) $("#mainContainer").html(miningOp.buildHtml());
   // }, 1000);
 });
-
-// Sample pairs of Date objects
-// const datePairs = [
-//   { start: new Date("2024-03-10T08:00:00"), end: new Date("2024-03-10T12:00:00") },
-//   { start: new Date("2024-03-09T15:00:00"), end: new Date("2024-03-09T18:00:00") },
-//   { start: new Date("2024-03-11T10:00:00"), end: new Date("2024-03-12T14:00:00") },
-//   { start: new Date("2024-03-11T10:00:00"), end: new Date("2024-03-16T14:00:00") },
-//   { start: new Date("2024-03-08T10:00:00"), end: new Date("2024-03-11T14:00:00") },
-//   { start: new Date("2024-03-15T10:00:00"), end: new Date("2024-03-23T14:00:00") },
-
-//   // Add more pairs as needed
-// ];
-
-// // Sort date pairs by start dates
-// datePairs.sort((a, b) => a.start - b.start);
-
-// // Function to check for overlaps or gaps between pairs
-// function findOverlapsAndGaps(datePairs) {
-//   let overlaps = [];
-//   let gaps = [];
-
-//   for (let i = 1; i < datePairs.length; i++) {
-//     const currentPair = datePairs[i];
-//     const previousPair = datePairs[i - 1];
-
-//     if (currentPair.start < previousPair.end) {
-//       // Overlap found
-//       overlaps.push({
-//         overlapStart: currentPair.start,
-//         overlapEnd: new Date(Math.min(currentPair.end, previousPair.end)),
-//       });
-//     } else {
-//       // Gap found
-//       gaps.push({
-//         gapStart: previousPair.end,
-//         gapEnd: currentPair.start,
-//       });
-//     }
-//   // }
-
-//   return { overlaps, gaps };
-// }
-
-// Find overlaps and gaps
-// const { overlaps, gaps } = findOverlapsAndGaps(datePairs);
-
-// Output the results
-// console.log("Overlaps:");
-// overlaps.forEach((overlap) => console.log(`${overlap.overlapStart} - ${overlap.overlapEnd}`));
-
-// console.log("\nGaps:");
-// gaps.forEach((gap) => console.log(`${gap.gapStart} - ${gap.gapEnd}`));
 
 const opJSON = `{"fleetLeader":"Bob Eagle","fleetName":"Eagle Fleet","startTime":"2024-03-16T13:44:00.000Z","playerMembers":[{"playerName":"Bob Eagle","characters":[{"characterName":"Bob Eagle","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"154f8a7a-4ae9-4d77-972f-ecc73708eb0d"}],"isActive":false,"id":"ad20d3c0-9b93-434a-ac4e-505ebf0f391b"},{"playerName":"Kyira","characters":[{"characterName":"Kyira","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"505d826a-dd79-4e2e-a54e-6d00924ce1fe"},{"characterName":"Kahraan","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"457a7fa5-3ffc-45af-a4af-79e5b383c4f9"}],"isActive":false,"id":"e551cb55-2e51-4cf5-a99f-fed33d871ae9"}],"htmlBuilder":{},"isActive":false,"id":"9bcaa53d-302b-4ce2-8381-1b510b29b2e1"}`;
