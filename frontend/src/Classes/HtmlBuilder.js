@@ -29,14 +29,14 @@ class HtmlBuilder {
           </a>
         </div>
         <div class="d-flex gap-4 align-items-center">
-          <a href="#" class="ars-btn op-add-btn op-btn2">
+          <a href="#" class="ars-btn op-add-btn op-btn2" data-btnScope="op" data-btnType="add">
             <img src="./img/plus.svg"  alt="add icon" data-btnScope="op" data-btnType="add" />
           </a>
           <a href="#" class="ars-btn op-pause-btn op-btn2" data-btnScope="op" data-btnType="pause"> 
             <img src="./img/${op.isActive ? "pause" : "play"}.svg"  alt="pause icon"> 
           </a>
           <div class="d-flex flex-column gap-1">
-            <div>Operation Work-Time: ${this._formatTime(opWorkTime)}</div>
+            <div>Operation Work-Time: <span class="timer" data-timertype="opWorkTime">${this.formatTime(opWorkTime)}</span></div>
           </div>
           <a href="#" class="ars-btn op-delete-btn op-btn2" data-btnScope="op" data-btnType="delete">
             <img src="./img/trash.svg"  alt="delete icon" />
@@ -60,7 +60,7 @@ class HtmlBuilder {
       <div class="row d-flex flex-column gap-1 pb-1">
         <div class="d-flex justify-content-between">
           <div class="d-flex gap-3 align-items-center">
-            <a href="#" class="ars-btn player-edit-btn p-1 player-btn" data-btnScope="character" data-btnType="edit">
+            <a href="#" class="ars-btn player-edit-btn p-1 player-btn" data-btnScope="player" data-btnType="edit">
               <img src="./img/edit.svg" alt="edit icon" />
             </a>
             <div class="fs-6">Player: ${player.playerName}</div>
@@ -71,8 +71,8 @@ class HtmlBuilder {
               <img src="./img/plus.svg" alt="plus icon" />
             </a>
             <a href="#" class="ars-btn player-pause-btn p-1 player-btn" data-btnScope="player" data-btnType="pause"> <img src="./img/${player.isActive ? "pause" : "play"}.svg" alt="pause icon" /> </a>
-            <div>Player Work-Time: ${this._formatTime(playerWorkTime)}</div>
-            <a href="#" class="ars-btn player-delete-btn p-1 player-btn">
+            <div>Player Work-Time: <span class="timer" data-timertype="playerWorkTime">${this.formatTime(playerWorkTime)}</span></div>
+            <a href="#" class="ars-btn player-delete-btn p-1 player-btn" data-btnScope="player" data-btnType="delete">
               <img src="./img/trash.svg" alt="delete icon" data-btnScope="player" data-btnType="delete" />
             </a>
           </div>
@@ -97,7 +97,7 @@ class HtmlBuilder {
       <a class="ars-btn character-pause-btn p-1 character-btn" href="#"" data-btnScope="character" data-btnType="pause">
         <img src="./img/${character.isActive ? "pause" : "play"}.svg"  alt="pause icon" />
       </a>
-      <div>Work-Time: ${this._formatTime(character.workTime())}</div>
+      <div>Work-Time: <span class="timer" data-timertype="characterWorkTime">${this.formatTime(character.workTime())}</span></div>
       <a href="#" class="ars-btn character-delete-btn p-1 character-btn" data-btnScope="character" data-btnType="delete">
         <img src="./img/trash.svg"  alt="pause icon" />
       </a>
@@ -105,7 +105,7 @@ class HtmlBuilder {
   </div>
     `;
   }
-  _formatTime(ms) {
+  formatTime(ms) {
     const pad = (num) => (num < 10 ? "0" : "") + num;
 
     // Convert ms to seconds

@@ -14,12 +14,81 @@ class MiningOp {
     this.isActive = false;
     this.id = self.crypto.randomUUID();
     this.splitOp = new SplitOp();
+    this.timerRefreshInterval = setInterval(() => {
+      this.timerRender();
+    }, 1000);
+  }
+  timerRender() {
+    $(".timer").each((index, element) => {
+      const workTimeIds = this.getIds(element);
+      let workTime = null;
+      if (workTimeIds.type === "characterWorkTime") {
+        workTime = this.htmlBuilder.formatTime(
+          this.playerMembers
+            .filter((player) => player.id === workTimeIds.playerId)[0]
+            .characters.filter((char) => char.id === workTimeIds.characterId)[0]
+            .workTime()
+        );
+      }
+      if (workTimeIds.type === "playerWorkTime") {
+        workTime = this.htmlBuilder.formatTime(
+          this.playerMembers
+            .filter((player) => player.id === workTimeIds.playerId)[0]
+            .characters.map((char) => char.workTime())
+            .reduce((acc, cur) => acc + cur, 0)
+        );
+      }
+      if (workTimeIds.type === "opWorkTime") {
+        workTime = this.htmlBuilder.formatTime(this.playerMembers.map((player) => player.characters.map((char) => char.workTime()).reduce((acc, cur) => acc + cur, 0)).reduce((acc, cur) => acc + cur, 0));
+      }
+      $(element).text(workTime);
+    });
+  }
+  getIds(element) {
+    const type = element.dataset.timertype;
+    const opId = $(element).closest(".op-container")[0].dataset.opid;
+    const playerId = type === "playerWorkTime" || type === "characterWorkTime" ? $(element).closest(".player-container")[0].dataset.playerid : null;
+    const characterId = type === "characterWorkTime" ? $(element).closest(".character-container")[0].dataset.characterid : null;
+    return {
+      type,
+      opId,
+      playerId,
+      characterId,
+    };
+  }
+  clickHandler(btnEventObj) {
+    console.log(btnEventObj);
+    if (btnEventObj.scope === "op") this.opBtnHandler(btnEventObj);
+    if (btnEventObj.scope === "player") this.playerBtnHandler(btnEventObj);
+    if (btnEventObj.scope === "character") this.characterBtnHandler(btnEventObj);
+    // $("#mainContainer").html(this.buildHtml());
+    // $(".ars-btn").on("click", (event) => {
+    //   this.btnHandler(event.target);
+    // });
+  }
+  opBtnHandler(btnEventObj) {
+    if (btnEventObj.type === "pause") return this.pause();
+    if (btnEventObj.type === "split") return this.split();
+    if (btnEventObj.type === "add") return this.addPlayerMember();
+    if (btnEventObj.type === "edit") return this.edit(btnEventObj);
+  }
+  playerBtnHandler(btnEventObj) {
+    if (btnEventObj.type === "delete") return this.deletePlayer(btnEventObj.playerId);
+    if (btnEventObj.type === "pause") return this.pausePlayer(btnEventObj);
+    if (btnEventObj.type === "add") return this.getPlayer(btnEventObj.playerId).addCharacter();
+    if (btnEventObj.type === "edit") return this.editPlayer(btnEventObj);
+  }
+  characterBtnHandler(btnEventObj) {
+    if (btnEventObj.type === "delete") return this.deleteCharacter(btnEventObj);
+    if (btnEventObj.type === "pause") return this.pauseCharacter(btnEventObj);
+    if (btnEventObj.type === "edit") return this.editCharacter(btnEventObj);
   }
   showDetails() {
     console.log(this.fleetLeader, this.fleetName, this.startTime);
   }
-  addPlayerMember(player) {
-    this.playerMembers.push(new Player(player));
+  addPlayerMember() {
+    const newPlayer = prompt("Enter player name");
+    if (newPlayer) this.playerMembers.push(new Player(newPlayer));
   }
   getPlayer(playerId) {
     return this.playerMembers.filter((player) => player.id === playerId)[0];
@@ -36,7 +105,8 @@ class MiningOp {
       this.deletePlayer(btnEventObj.playerId);
     }
   }
-  pause() {
+  pause(btnEventObj) {
+    console.log("pausing op:", btnEventObj);
     if (this.isActive) {
       this.playerMembers.forEach((player) => player.pause());
       this.isActive = !this.isActive;
@@ -65,9 +135,28 @@ class MiningOp {
     characterToPause.unpause();
     playerToPause.isActive = true;
   }
+  edit(btnEventObj) {
+    console.log("editing Op:", btnEventObj);
+  }
+  editPlayer(btnEventObj) {
+    console.log("editing player:", btnEventObj);
+  }
+  editCharacter(btnEventObj) {
+    console.log("editing character:", btnEventObj);
+  }
   buildHtml() {
     return this.htmlBuilder.opHtml(this);
   }
+  // btnHandler = (target) => {
+  //   const scope = $(target).closest(".ars-btn")[0].dataset.btnscope;
+  //   const type = $(target).closest(".ars-btn")[0].dataset.btntype;
+  //   const opId = $(target).closest(".op-container")[0].dataset.opid;
+  //   const playerId = scope == "player" || scope == "character" ? $(target).closest(".player-container")[0].dataset.playerid : null;
+  //   const characterId = scope == "character" ? $(target).closest(".character-container")[0].dataset.characterid : null;
+  //   if (scope === "op" && type === "delete") return opDelete();
+  //   this.clickHandler({ scope, type, opId, playerId, characterId });
+  // };
+
   split() {
     return this.splitOp.split(this);
   }

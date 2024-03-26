@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A.R.S.E.</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <link rel="stylesheet" href="./styles/styles.css" />
+  </head>
+  <body>
+    <!-- Split Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">...</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- New Fleet Modal -->
+    <div class="modal fade" id="newFleetModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel">New Mining Op</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="newFleetForm">
+              <div class="mb-3">
+                <label for="fleetNameInput" class="form-label">Fleet Name</label>
+                <input type="text" class="form-control" id="fleetNameInput" />
+              </div>
+              <div class="mb-3">
+                <label for="fleetLeaderInput" class="form-label">Fleet Leader</label>
+                <input type="text" class="form-control" id="fleetLeaderInput" />
+              </div>
+              <div class="mb-3">
+                <label for="datepicker" class="form-label">Start Time</label>
+                <input type="text" class="form-control" id="datepicker" />
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Your content goes here -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light borders">
+      <div class="container">
+        <a class="navbar-brand" href="#">Activity Remuneration Split Estimator</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ms-auto">
+            <liv class="nav-items"><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Launch demo modal</button></liv>
+            <li class="nav-item"><button id="showDetails" type="button" class="btn btn-success mx-3">Show Details</button></li>
+
+            <li class="nav-item">
+              <button type="button" id="newFleetModalBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newFleetModal">New Mining Op</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div id="mainContainer" style="height: 80vh" class="container-lg borders rounded p-1 gap-1 d-flex flex-column mt-1"></div>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto py-3 bg-light">
+      <div class="container text-center">
+        <span class="text-muted">Your footer content here.</span>
+      </div>
+    </footer>
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/uuid@9.0.1/dist/index.min.js"></script> -->
+    <script type="module" defer src="./bundle.js"></script>
+  </body>
+</html>

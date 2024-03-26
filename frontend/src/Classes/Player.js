@@ -11,7 +11,8 @@ class Player {
     this.id = self.crypto.randomUUID();
   }
   addCharacter(character) {
-    this.characters.push(new Character(character));
+    const newCharacter = prompt("Enter character name", character);
+    this.characters.push(new Character(newCharacter));
   }
   getCharacter(characterId) {
     return this.characters.filter((character) => character.id === characterId)[0];

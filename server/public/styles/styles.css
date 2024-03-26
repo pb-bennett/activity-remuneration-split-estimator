@@ -1,0 +1,35 @@
+.borders {
+  border: 1px rgb(123, 123, 123) solid;
+}
+
+.character-container,
+.op-container {
+  background-color: rgb(242, 242, 242);
+}
+
+.player-container {
+  background-color: rgb(255, 255, 255);
+}
+
+.character-container {
+  height: 3rem;
+}
+
+.character-btn {
+  width: 1.5rem;
+}
+
+.player-btn {
+  width: 1.5rem;
+}
+
+.op-btn {
+  width: 2.2rem;
+}
+.op-btn2 {
+  width: 1.8rem;
+}
+
+.bg-red {
+  background-color: red;
+}
