@@ -28,12 +28,12 @@ $(document).ready(function () {
   flatpickr("#datepicker", datePickerOptions);
   $("#showDetails").on("click", (event) => {});
 
-  miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
-  $("#mainContainer").html(miningOp.buildHtml());
+  // miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
+  // $("#mainContainer").html(miningOp.buildHtml());
 
-  $(".ars-btn").on("click", (event) => {
-    btnHandler(event.target);
-  });
+  // $(".ars-btn").on("click", (event) => {
+  //   btnHandler(event.target);
+  // });
   // refreshInterval = setInterval(() => {
   //   if (miningOp.fleetName) {
   //     $("#mainContainer").html(miningOp.buildHtml());
@@ -42,6 +42,8 @@ $(document).ready(function () {
   //     });
   //   }
   // }, 1000);
+
+  // fetchCharacterData();
 });
 
 const btnHandler = (target) => {
@@ -73,5 +75,16 @@ const opDelete = () => {
     $("#newFleetModalBtn").prop("disabled", false);
     $("#showDetails").prop("disabled", true);
     $("#mainContainer").html("");
+  }
+};
+
+const fetchCharacterData = async () => {
+  try {
+    const rawCharacterData = await fetch("http://localhost:3500/api/v1/players/characters");
+    const characterData = await rawCharacterData.json();
+    console.log(characterData.characters);
+    return characterData;
+  } catch (error) {
+    console.log(error);
   }
 };

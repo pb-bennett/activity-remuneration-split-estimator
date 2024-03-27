@@ -1,0 +1,17 @@
+[
+  {
+    "playerName": "Will Eagle",
+    "playerId": 1,
+    "characters": [{ "characterName": "EagleKnight15" }, { "characterName": "EagleKnight25" }, { "characterName": "Will Eagle" }]
+  },
+  {
+    "playerName": "Kyira",
+    "playerId": 2,
+    "characters": [{ "characterName": "Kyira" }, { "characterName": "Kahraan" }, { "characterName": "Kirk Starspline" }]
+  },
+  {
+    "playerName": "Xanden2",
+    "playerId": 3,
+    "characters": [{ "characterName": "Xanden2" }, { "characterName": "Xanden3" }, { "characterName": "Xanden4" }, { "characterName": "Xandamaris" }]
+  }
+]

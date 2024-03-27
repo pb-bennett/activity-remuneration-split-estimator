@@ -12,6 +12,6 @@ export default {
     resolve(), // Add the resolve plugin
   ],
   watch: {
-    include: "src/**",
+    include: "frontend/src/**",
   },
 };

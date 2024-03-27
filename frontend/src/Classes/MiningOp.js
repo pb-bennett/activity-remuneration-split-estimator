@@ -17,6 +17,9 @@ class MiningOp {
     this.timerRefreshInterval = setInterval(() => {
       this.timerRender();
     }, 1000);
+    $(".ars-btn").on("click", (event) => {
+      btnHandler(event.target);
+    });
   }
   timerRender() {
     $(".timer").each((index, element) => {

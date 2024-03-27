@@ -2793,6 +2793,9 @@ class MiningOp {
     this.timerRefreshInterval = setInterval(() => {
       this.timerRender();
     }, 1000);
+    $(".ars-btn").on("click", (event) => {
+      btnHandler(event.target);
+    });
   }
   timerRender() {
     $(".timer").each((index, element) => {
@@ -2971,8 +2974,6 @@ const datePickerOptions = {
   time_24hr: true,
 };
 
-const opJSON = `{"fleetLeader":"Bob Eagle","fleetName":"Eagle Fleet","startTime":"2024-03-16T13:44:00.000Z","playerMembers":[{"playerName":"Bob Eagle","characters":[{"characterName":"Bob Eagle","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"154f8a7a-4ae9-4d77-972f-ecc73708eb0d"}],"isActive":false,"id":"ad20d3c0-9b93-434a-ac4e-505ebf0f391b"},{"playerName":"Kyira","characters":[{"characterName":"Kyira","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"505d826a-dd79-4e2e-a54e-6d00924ce1fe"},{"characterName":"Kahraan","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"457a7fa5-3ffc-45af-a4af-79e5b383c4f9"}],"isActive":false,"id":"e551cb55-2e51-4cf5-a99f-fed33d871ae9"}],"htmlBuilder":{},"isActive":false,"id":"9bcaa53d-302b-4ce2-8381-1b510b29b2e1"}`;
-
 let miningOp;
 let refreshInterval;
 
@@ -2997,12 +2998,12 @@ $(document).ready(function () {
   flatpickr("#datepicker", datePickerOptions);
   $("#showDetails").on("click", (event) => {});
 
-  miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
-  $("#mainContainer").html(miningOp.buildHtml());
+  // miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
+  // $("#mainContainer").html(miningOp.buildHtml());
 
-  $(".ars-btn").on("click", (event) => {
-    btnHandler(event.target);
-  });
+  // $(".ars-btn").on("click", (event) => {
+  //   btnHandler(event.target);
+  // });
   // refreshInterval = setInterval(() => {
   //   if (miningOp.fleetName) {
   //     $("#mainContainer").html(miningOp.buildHtml());
@@ -3011,36 +3012,6 @@ $(document).ready(function () {
   //     });
   //   }
   // }, 1000);
+
+  // fetchCharacterData();
 });
-
-const btnHandler = (target) => {
-  const scope = $(target).closest(".ars-btn")[0].dataset.btnscope;
-  const type = $(target).closest(".ars-btn")[0].dataset.btntype;
-  const opId = $(target).closest(".op-container")[0].dataset.opid;
-  const playerId = scope == "player" || scope == "character" ? $(target).closest(".player-container")[0].dataset.playerid : null;
-  const characterId = scope == "character" ? $(target).closest(".character-container")[0].dataset.characterid : null;
-  if (scope === "op" && type === "delete") {
-    opDelete();
-  } else {
-    miningOp.clickHandler({ scope, type, opId, playerId, characterId });
-  }
-
-  $("#mainContainer").html(miningOp.buildHtml());
-  setTimeout(() => {
-    $(".ars-btn").on("click", (event) => {
-      btnHandler(event.target);
-    });
-  }, 500);
-  // $(".ars-btn").on("click", (event) => {
-  //   btnHandler(event.target);
-  // });
-};
-const opDelete = () => {
-  const confirmation = confirm(`Are you sure you want to delete ${miningOp.fleetName}?`);
-  if (confirmation) {
-    miningOp = {};
-    $("#newFleetModalBtn").prop("disabled", false);
-    $("#showDetails").prop("disabled", true);
-    $("#mainContainer").html("");
-  }
-};
