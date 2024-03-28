@@ -28,12 +28,12 @@ $(document).ready(function () {
   flatpickr("#datepicker", datePickerOptions);
   $("#showDetails").on("click", (event) => {});
 
-  // miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
-  // $("#mainContainer").html(miningOp.buildHtml());
+  miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
+  $("#mainContainer").html(miningOp.buildHtml());
 
-  // $(".ars-btn").on("click", (event) => {
-  //   btnHandler(event.target);
-  // });
+  $(".ars-btn").on("click", (event) => {
+    btnHandler(event.target);
+  });
   // refreshInterval = setInterval(() => {
   //   if (miningOp.fleetName) {
   //     $("#mainContainer").html(miningOp.buildHtml());
@@ -59,14 +59,9 @@ const btnHandler = (target) => {
   }
 
   $("#mainContainer").html(miningOp.buildHtml());
-  setTimeout(() => {
-    $(".ars-btn").on("click", (event) => {
-      btnHandler(event.target);
-    });
-  }, 500);
-  // $(".ars-btn").on("click", (event) => {
-  //   btnHandler(event.target);
-  // });
+  $(".ars-btn").on("click", (event) => {
+    btnHandler(event.target);
+  });
 };
 const opDelete = () => {
   const confirmation = confirm(`Are you sure you want to delete ${miningOp.fleetName}?`);

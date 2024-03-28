@@ -2,6 +2,7 @@ import Player from "./Player.js";
 import Character from "./Character.js";
 import HtmlBuilder from "./HtmlBuilder.js";
 import SplitOp from "./SplitOp.js";
+import BtnHandler from "./BtnHandler.js";
 
 class MiningOp {
   constructor(fleetLeader, fleetName, startTime, reload = false) {
@@ -12,6 +13,7 @@ class MiningOp {
     if (!reload) this.addPlayerMember(fleetLeader);
     this.htmlBuilder = new HtmlBuilder();
     this.isActive = false;
+    this.hasBeenActive = false;
     this.id = self.crypto.randomUUID();
     this.splitOp = new SplitOp();
     this.timerRefreshInterval = setInterval(() => {
@@ -60,32 +62,9 @@ class MiningOp {
     };
   }
   clickHandler(btnEventObj) {
-    console.log(btnEventObj);
-    if (btnEventObj.scope === "op") this.opBtnHandler(btnEventObj);
-    if (btnEventObj.scope === "player") this.playerBtnHandler(btnEventObj);
-    if (btnEventObj.scope === "character") this.characterBtnHandler(btnEventObj);
-    // $("#mainContainer").html(this.buildHtml());
-    // $(".ars-btn").on("click", (event) => {
-    //   this.btnHandler(event.target);
-    // });
+    BtnHandler.clickHandler(btnEventObj, this);
   }
-  opBtnHandler(btnEventObj) {
-    if (btnEventObj.type === "pause") return this.pause();
-    if (btnEventObj.type === "split") return this.split();
-    if (btnEventObj.type === "add") return this.addPlayerMember();
-    if (btnEventObj.type === "edit") return this.edit(btnEventObj);
-  }
-  playerBtnHandler(btnEventObj) {
-    if (btnEventObj.type === "delete") return this.deletePlayer(btnEventObj.playerId);
-    if (btnEventObj.type === "pause") return this.pausePlayer(btnEventObj);
-    if (btnEventObj.type === "add") return this.getPlayer(btnEventObj.playerId).addCharacter();
-    if (btnEventObj.type === "edit") return this.editPlayer(btnEventObj);
-  }
-  characterBtnHandler(btnEventObj) {
-    if (btnEventObj.type === "delete") return this.deleteCharacter(btnEventObj);
-    if (btnEventObj.type === "pause") return this.pauseCharacter(btnEventObj);
-    if (btnEventObj.type === "edit") return this.editCharacter(btnEventObj);
-  }
+
   showDetails() {
     console.log(this.fleetLeader, this.fleetName, this.startTime);
   }
@@ -117,15 +96,20 @@ class MiningOp {
     }
     this.playerMembers.forEach((player) => player.unpause());
     this.isActive = !this.isActive;
+    this.hasBeenActive = true;
   }
   pausePlayer(btnEventObj) {
+    if (!this.hasBeenActive) return;
     const playerToPause = this.getPlayer(btnEventObj.playerId);
+
     if (playerToPause.isActive) return playerToPause.pause();
+    this.isActive = true;
     playerToPause.unpause();
   }
 
   //Toggles pause - should rename function
   pauseCharacter(btnEventObj) {
+    if (!this.hasBeenActive) return;
     const characterToPause = this.getCharacter(btnEventObj);
     const playerToPause = this.getPlayer(btnEventObj.playerId);
     // pausing character if is active
@@ -136,6 +120,7 @@ class MiningOp {
       return;
     }
     characterToPause.unpause();
+    this.isActive = true;
     playerToPause.isActive = true;
   }
   edit(btnEventObj) {

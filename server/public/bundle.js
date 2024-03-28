@@ -2779,6 +2779,36 @@ class SplitOp {
   }
 }
 
+class BtnHandler {
+  static clickHandler(btnEventObj, miningOp) {
+    console.log(btnEventObj);
+    if (btnEventObj.scope === "op") this.opBtnHandler(btnEventObj, miningOp);
+    if (btnEventObj.scope === "player") this.playerBtnHandler(btnEventObj, miningOp);
+    if (btnEventObj.scope === "character") this.characterBtnHandler(btnEventObj, miningOp);
+    // $("#mainContainer").html(this.buildHtml());
+    // $(".ars-btn").on("click", (event) => {
+    //   this.btnHandler(event.target);
+    // });
+  }
+  static opBtnHandler(btnEventObj, miningOp) {
+    if (btnEventObj.type === "pause") return miningOp.pause();
+    if (btnEventObj.type === "split") return miningOp.split();
+    if (btnEventObj.type === "add") return miningOp.addPlayerMember();
+    if (btnEventObj.type === "edit") return miningOp.edit(btnEventObj);
+  }
+  static playerBtnHandler(btnEventObj, miningOp) {
+    if (btnEventObj.type === "delete") return miningOp.deletePlayer(btnEventObj.playerId);
+    if (btnEventObj.type === "pause") return miningOp.pausePlayer(btnEventObj);
+    if (btnEventObj.type === "add") return miningOp.getPlayer(btnEventObj.playerId).addCharacter();
+    if (btnEventObj.type === "edit") return miningOp.editPlayer(btnEventObj);
+  }
+  static characterBtnHandler(btnEventObj, miningOp) {
+    if (btnEventObj.type === "delete") return miningOp.deleteCharacter(btnEventObj);
+    if (btnEventObj.type === "pause") return miningOp.pauseCharacter(btnEventObj);
+    if (btnEventObj.type === "edit") return miningOp.editCharacter(btnEventObj);
+  }
+}
+
 class MiningOp {
   constructor(fleetLeader, fleetName, startTime, reload = false) {
     this.fleetLeader = fleetLeader;
@@ -2788,6 +2818,7 @@ class MiningOp {
     if (!reload) this.addPlayerMember(fleetLeader);
     this.htmlBuilder = new HtmlBuilder();
     this.isActive = false;
+    this.hasBeenActive = false;
     this.id = self.crypto.randomUUID();
     this.splitOp = new SplitOp();
     this.timerRefreshInterval = setInterval(() => {
@@ -2836,32 +2867,9 @@ class MiningOp {
     };
   }
   clickHandler(btnEventObj) {
-    console.log(btnEventObj);
-    if (btnEventObj.scope === "op") this.opBtnHandler(btnEventObj);
-    if (btnEventObj.scope === "player") this.playerBtnHandler(btnEventObj);
-    if (btnEventObj.scope === "character") this.characterBtnHandler(btnEventObj);
-    // $("#mainContainer").html(this.buildHtml());
-    // $(".ars-btn").on("click", (event) => {
-    //   this.btnHandler(event.target);
-    // });
+    BtnHandler.clickHandler(btnEventObj, this);
   }
-  opBtnHandler(btnEventObj) {
-    if (btnEventObj.type === "pause") return this.pause();
-    if (btnEventObj.type === "split") return this.split();
-    if (btnEventObj.type === "add") return this.addPlayerMember();
-    if (btnEventObj.type === "edit") return this.edit(btnEventObj);
-  }
-  playerBtnHandler(btnEventObj) {
-    if (btnEventObj.type === "delete") return this.deletePlayer(btnEventObj.playerId);
-    if (btnEventObj.type === "pause") return this.pausePlayer(btnEventObj);
-    if (btnEventObj.type === "add") return this.getPlayer(btnEventObj.playerId).addCharacter();
-    if (btnEventObj.type === "edit") return this.editPlayer(btnEventObj);
-  }
-  characterBtnHandler(btnEventObj) {
-    if (btnEventObj.type === "delete") return this.deleteCharacter(btnEventObj);
-    if (btnEventObj.type === "pause") return this.pauseCharacter(btnEventObj);
-    if (btnEventObj.type === "edit") return this.editCharacter(btnEventObj);
-  }
+
   showDetails() {
     console.log(this.fleetLeader, this.fleetName, this.startTime);
   }
@@ -2893,15 +2901,20 @@ class MiningOp {
     }
     this.playerMembers.forEach((player) => player.unpause());
     this.isActive = !this.isActive;
+    this.hasBeenActive = true;
   }
   pausePlayer(btnEventObj) {
+    if (!this.hasBeenActive) return;
     const playerToPause = this.getPlayer(btnEventObj.playerId);
+
     if (playerToPause.isActive) return playerToPause.pause();
+    this.isActive = true;
     playerToPause.unpause();
   }
 
   //Toggles pause - should rename function
   pauseCharacter(btnEventObj) {
+    if (!this.hasBeenActive) return;
     const characterToPause = this.getCharacter(btnEventObj);
     const playerToPause = this.getPlayer(btnEventObj.playerId);
     // pausing character if is active
@@ -2912,6 +2925,7 @@ class MiningOp {
       return;
     }
     characterToPause.unpause();
+    this.isActive = true;
     playerToPause.isActive = true;
   }
   edit(btnEventObj) {
@@ -2974,6 +2988,8 @@ const datePickerOptions = {
   time_24hr: true,
 };
 
+const opJSON = `{"fleetLeader":"Bob Eagle","fleetName":"Eagle Fleet","startTime":"2024-03-16T13:44:00.000Z","playerMembers":[{"playerName":"Bob Eagle","characters":[{"characterName":"Bob Eagle","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"154f8a7a-4ae9-4d77-972f-ecc73708eb0d"}],"isActive":false,"id":"ad20d3c0-9b93-434a-ac4e-505ebf0f391b"},{"playerName":"Kyira","characters":[{"characterName":"Kyira","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"505d826a-dd79-4e2e-a54e-6d00924ce1fe"},{"characterName":"Kahraan","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"457a7fa5-3ffc-45af-a4af-79e5b383c4f9"}],"isActive":false,"id":"e551cb55-2e51-4cf5-a99f-fed33d871ae9"}],"htmlBuilder":{},"isActive":false,"id":"9bcaa53d-302b-4ce2-8381-1b510b29b2e1"}`;
+
 let miningOp;
 let refreshInterval;
 
@@ -2998,12 +3014,12 @@ $(document).ready(function () {
   flatpickr("#datepicker", datePickerOptions);
   $("#showDetails").on("click", (event) => {});
 
-  // miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
-  // $("#mainContainer").html(miningOp.buildHtml());
+  miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
+  $("#mainContainer").html(miningOp.buildHtml());
 
-  // $(".ars-btn").on("click", (event) => {
-  //   btnHandler(event.target);
-  // });
+  $(".ars-btn").on("click", (event) => {
+    btnHandler$1(event.target);
+  });
   // refreshInterval = setInterval(() => {
   //   if (miningOp.fleetName) {
   //     $("#mainContainer").html(miningOp.buildHtml());
@@ -3015,3 +3031,30 @@ $(document).ready(function () {
 
   // fetchCharacterData();
 });
+
+const btnHandler$1 = (target) => {
+  const scope = $(target).closest(".ars-btn")[0].dataset.btnscope;
+  const type = $(target).closest(".ars-btn")[0].dataset.btntype;
+  const opId = $(target).closest(".op-container")[0].dataset.opid;
+  const playerId = scope == "player" || scope == "character" ? $(target).closest(".player-container")[0].dataset.playerid : null;
+  const characterId = scope == "character" ? $(target).closest(".character-container")[0].dataset.characterid : null;
+  if (scope === "op" && type === "delete") {
+    opDelete();
+  } else {
+    miningOp.clickHandler({ scope, type, opId, playerId, characterId });
+  }
+
+  $("#mainContainer").html(miningOp.buildHtml());
+  $(".ars-btn").on("click", (event) => {
+    btnHandler$1(event.target);
+  });
+};
+const opDelete = () => {
+  const confirmation = confirm(`Are you sure you want to delete ${miningOp.fleetName}?`);
+  if (confirmation) {
+    miningOp = {};
+    $("#newFleetModalBtn").prop("disabled", false);
+    $("#showDetails").prop("disabled", true);
+    $("#mainContainer").html("");
+  }
+};
