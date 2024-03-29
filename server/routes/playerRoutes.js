@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { getCharacters } = require("../controllers/playersController");
+const { getAllPlayers, getPlayer } = require("../controllers/playerController");
 
-router.get("/characters", getCharacters);
+router.get("/", getAllPlayers).get("/:id", getPlayer);
 
 module.exports = router;

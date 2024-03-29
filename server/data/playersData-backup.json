@@ -1,0 +1,34 @@
+[
+  {
+    "playerName": "Will Eagle",
+    "playerId": "5f34ab5b-1066-46e0-ade1-e7e92f07080a",
+    "characterId": 95642985,
+    "characters": [
+      { "characterId": 2119736087, "name": "EagleKnight15" },
+      { "characterId": 2122066074, "name": "EagleKnight50" },
+      { "characterId": 95642985, "name": "Will Eagle" },
+      { "characterId": 2121450668, "name": "WatchTower15" }
+    ]
+  },
+  {
+    "playerName": "Kyira",
+    "playerId": "7dae2387-5114-4691-882b-a700d36ae419",
+    "characterId": 889314070,
+    "characters": [
+      { "characterId": 889314070, "name": "Kyira" },
+      { "characterId": 886988979, "name": "Kahraan" },
+      { "characterId": 619154305, "name": "Kirk Starspline" }
+    ]
+  },
+  {
+    "playerName": "Xanden2",
+    "playerId": 3,
+    "characterId": 2119522072,
+    "characters": [
+      { "characterId": 2119522072, "name": "Xanden2" },
+      { "characterId": 2119726874, "name": "Xanden3" },
+      { "characterId": 2119726819, "name": "Xanden4" },
+      { "characterId": 2119540473, "name": "Xandamaris" }
+    ]
+  }
+]

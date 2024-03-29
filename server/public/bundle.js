@@ -2991,35 +2991,40 @@ const datePickerOptions = {
 const opJSON = `{"fleetLeader":"Bob Eagle","fleetName":"Eagle Fleet","startTime":"2024-03-16T13:44:00.000Z","playerMembers":[{"playerName":"Bob Eagle","characters":[{"characterName":"Bob Eagle","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"154f8a7a-4ae9-4d77-972f-ecc73708eb0d"}],"isActive":false,"id":"ad20d3c0-9b93-434a-ac4e-505ebf0f391b"},{"playerName":"Kyira","characters":[{"characterName":"Kyira","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"505d826a-dd79-4e2e-a54e-6d00924ce1fe"},{"characterName":"Kahraan","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"457a7fa5-3ffc-45af-a4af-79e5b383c4f9"}],"isActive":false,"id":"e551cb55-2e51-4cf5-a99f-fed33d871ae9"}],"htmlBuilder":{},"isActive":false,"id":"9bcaa53d-302b-4ce2-8381-1b510b29b2e1"}`;
 
 let miningOp;
-let refreshInterval;
+// let refreshInterval;
 
 $(document).ready(function () {
-  $("#newFleetForm").on("submit", (event) => {
-    event.preventDefault();
-
-    if (!miningOp?.fleetName) miningOp = new MiningOp($("#fleetLeaderInput").val(), $("#fleetNameInput").val(), $("#datepicker").val());
-    clearInterval(refreshInterval);
-    // miningOp.addPlayerMember("Kyira");
-    // miningOp.playerMembers.filter((p) => p.playerName === "Kyira")[0].addCharacter("Kahraan");
-    $(newFleetModal).modal("hide");
-    $("#newFleetModalBtn").prop("disabled", true);
-    $("#showDetails").prop("disabled", false);
-    $("#mainContainer").html(miningOp.buildHtml());
-    JSON.stringify(miningOp);
-
-    // refreshInterval = setInterval(() => {
-    //   if (miningOp.fleetName) $("#mainContainer").html(miningOp.buildHtml());
-    // }, 1000);
+  $("#openModalBtn").click(function () {
+    $("#exampleModal").modal("show");
   });
+
+  // Function to close modal
+  // $(".modal").on("click", "[data-bs-dismiss='modal']", function (event) {
+  //   event.stopPropagation();
+  //   $(this).closest(".modal").modal("hide");
+  // });
+
   flatpickr("#datepicker", datePickerOptions);
-  $("#showDetails").on("click", (event) => {});
+  $("#showDetails").on("click", (event) => {
+    miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
+    $("#mainContainer").html(miningOp.buildHtml());
 
-  miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
-  $("#mainContainer").html(miningOp.buildHtml());
-
-  $(".ars-btn").on("click", (event) => {
-    btnHandler$1(event.target);
+    $(".ars-btn").on("click", (event) => {
+      btnHandler$1(event.target);
+    });
   });
+
+  // $("#openModalButton").click(function () {
+  //   // Replace this with your dynamic content generation logic
+  //   var dynamicContent = "<p>This is some dynamic content.</p>";
+  //   dynamicContent += "<p>This content is generated dynamically.</p>";
+
+  //   // Set the dynamic content to the modal body
+  //   $("#modalBody").html(dynamicContent);
+
+  //   // Show the modal
+  //   $("#exampleModal").modal("show");
+  // });
   // refreshInterval = setInterval(() => {
   //   if (miningOp.fleetName) {
   //     $("#mainContainer").html(miningOp.buildHtml());
@@ -3053,8 +3058,22 @@ const opDelete = () => {
   const confirmation = confirm(`Are you sure you want to delete ${miningOp.fleetName}?`);
   if (confirmation) {
     miningOp = {};
-    $("#newFleetModalBtn").prop("disabled", false);
-    $("#showDetails").prop("disabled", true);
+    // $("#newFleetModalBtn").prop("disabled", false);
+    // $("#showDetails").prop("disabled", true);
     $("#mainContainer").html("");
   }
 };
+
+// $("#newFleetForm").on("submit", (event) => {
+//   event.preventDefault();
+
+//   if (!miningOp?.fleetName) miningOp = new MiningOp($("#fleetLeaderInput").val(), $("#fleetNameInput").val(), $("#datepicker").val());
+//   clearInterval(refreshInterval);
+//   // miningOp.addPlayerMember("Kyira");
+//   // miningOp.playerMembers.filter((p) => p.playerName === "Kyira")[0].addCharacter("Kahraan");
+//   $(newFleetModal).modal("hide");
+//   $("#newFleetModalBtn").prop("disabled", true);
+//   $("#showDetails").prop("disabled", false);
+//   $("#mainContainer").html(miningOp.buildHtml());
+//   // const miningOpJson = JSON.stringify(miningOp);
+// });

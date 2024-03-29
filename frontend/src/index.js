@@ -5,35 +5,40 @@ import { datePickerOptions } from "./options.js";
 import { opJSON } from "./data.js";
 
 let miningOp;
-let refreshInterval;
+// let refreshInterval;
 
 $(document).ready(function () {
-  $("#newFleetForm").on("submit", (event) => {
-    event.preventDefault();
-
-    if (!miningOp?.fleetName) miningOp = new MiningOp($("#fleetLeaderInput").val(), $("#fleetNameInput").val(), $("#datepicker").val());
-    clearInterval(refreshInterval);
-    // miningOp.addPlayerMember("Kyira");
-    // miningOp.playerMembers.filter((p) => p.playerName === "Kyira")[0].addCharacter("Kahraan");
-    $(newFleetModal).modal("hide");
-    $("#newFleetModalBtn").prop("disabled", true);
-    $("#showDetails").prop("disabled", false);
-    $("#mainContainer").html(miningOp.buildHtml());
-    const miningOpJson = JSON.stringify(miningOp);
-
-    // refreshInterval = setInterval(() => {
-    //   if (miningOp.fleetName) $("#mainContainer").html(miningOp.buildHtml());
-    // }, 1000);
+  $("#openModalBtn").click(function () {
+    $("#exampleModal").modal("show");
   });
+
+  // Function to close modal
+  // $(".modal").on("click", "[data-bs-dismiss='modal']", function (event) {
+  //   event.stopPropagation();
+  //   $(this).closest(".modal").modal("hide");
+  // });
+
   flatpickr("#datepicker", datePickerOptions);
-  $("#showDetails").on("click", (event) => {});
+  $("#showDetails").on("click", (event) => {
+    miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
+    $("#mainContainer").html(miningOp.buildHtml());
 
-  miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
-  $("#mainContainer").html(miningOp.buildHtml());
-
-  $(".ars-btn").on("click", (event) => {
-    btnHandler(event.target);
+    $(".ars-btn").on("click", (event) => {
+      btnHandler(event.target);
+    });
   });
+
+  // $("#openModalButton").click(function () {
+  //   // Replace this with your dynamic content generation logic
+  //   var dynamicContent = "<p>This is some dynamic content.</p>";
+  //   dynamicContent += "<p>This content is generated dynamically.</p>";
+
+  //   // Set the dynamic content to the modal body
+  //   $("#modalBody").html(dynamicContent);
+
+  //   // Show the modal
+  //   $("#exampleModal").modal("show");
+  // });
   // refreshInterval = setInterval(() => {
   //   if (miningOp.fleetName) {
   //     $("#mainContainer").html(miningOp.buildHtml());
@@ -67,8 +72,8 @@ const opDelete = () => {
   const confirmation = confirm(`Are you sure you want to delete ${miningOp.fleetName}?`);
   if (confirmation) {
     miningOp = {};
-    $("#newFleetModalBtn").prop("disabled", false);
-    $("#showDetails").prop("disabled", true);
+    // $("#newFleetModalBtn").prop("disabled", false);
+    // $("#showDetails").prop("disabled", true);
     $("#mainContainer").html("");
   }
 };
@@ -83,3 +88,17 @@ const fetchCharacterData = async () => {
     console.log(error);
   }
 };
+
+// $("#newFleetForm").on("submit", (event) => {
+//   event.preventDefault();
+
+//   if (!miningOp?.fleetName) miningOp = new MiningOp($("#fleetLeaderInput").val(), $("#fleetNameInput").val(), $("#datepicker").val());
+//   clearInterval(refreshInterval);
+//   // miningOp.addPlayerMember("Kyira");
+//   // miningOp.playerMembers.filter((p) => p.playerName === "Kyira")[0].addCharacter("Kahraan");
+//   $(newFleetModal).modal("hide");
+//   $("#newFleetModalBtn").prop("disabled", true);
+//   $("#showDetails").prop("disabled", false);
+//   $("#mainContainer").html(miningOp.buildHtml());
+//   // const miningOpJson = JSON.stringify(miningOp);
+// });
