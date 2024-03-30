@@ -1,6 +1,8 @@
 const fs = require("fs").promises;
 const path = require("path");
 
+const Player = require("../models/playerModel");
+
 const { checkFileExists } = require("./controllerUtils");
 
 exports.getAllPlayers = async (req, res) => {
@@ -49,23 +51,28 @@ exports.getPlayer = async (req, res) => {
   }
 };
 
-exports.addPlayer = async (req, res) => {
+exports.createPlayer = async (req, res) => {
   try {
-    const filePath = path.resolve(process.env.PLAYERS_DATA_FILEPATH);
-    // Check if the file exists
-    await checkFileExists(filePath);
-    // Read file and parse JSON
-    const { result, player, players } = await checkPlayerExists(filePath, req.body.player.playerName, true);
-    // Add player
-    if (player.length !== 0) {
-      const newError = new Error(`Player with name ${req.body.player.playerName} already exists in data source: ${filePath}`);
-      newError.statusCode = 409; // Conflict status code
-      throw newError;
-    }
-    const newPlayers = [...players, req.body.player];
-    // Write updated data to file
-    await fs.writeFile(filePath, JSON.stringify(newPlayers, null, 2));
-    res.status(200).json({ result: "success", player: req.body.player });
+    const newPlayer = req.body.player;
+    // Check if player already exists
+    console.log(newPlayer);
+    const result = await Player.create(newPlayer);
+    res.status(200).json({ result: "success", player: result });
+    // const filePath = path.resolve(process.env.PLAYERS_DATA_FILEPATH);
+    // // Check if the file exists
+    // await checkFileExists(filePath);
+    // // Read file and parse JSON
+    // const { result, player, players } = await checkPlayerExists(filePath, req.body.player.playerName, true);
+    // // Add player
+    // if (player.length !== 0) {
+    //   const newError = new Error(`Player with name ${req.body.player.playerName} already exists in data source: ${filePath}`);
+    //   newError.statusCode = 409; // Conflict status code
+    //   throw newError;
+    // }
+    // const newPlayers = [...players, req.body.player];
+    // // Write updated data to file
+    // await fs.writeFile(filePath, JSON.stringify(newPlayers, null, 2));
+    // res.status(200).json({ result: "success", player: req.body.player });
   } catch (error) {
     const statusCode = error.statusCode || 500;
     const errorMessage = error.message || "Internal server error";
