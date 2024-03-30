@@ -2,7 +2,7 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 
 const app = require("./app");
-const { updateCharactersDB } = require("./utils/updateCharactersDB");
+const { updateCharactersDB, resetPlayersDB } = require("./utils/updateDBs");
 
 const port = process.env.PORT || 3500;
 
@@ -15,9 +15,11 @@ mongoose
     app.listen(port, () => {
       console.log(`👂👂Listening on port ${port}👂👂`);
     });
+  })
+  .then(() => {
+    // resetPlayersDB();
+    // updateCharactersDB();
   });
-
-// updateCharactersDB();
 
 process.on("unhandledRejection", (err) => {
   console.log("💥 UNHANDLED REJECTION! 💥 Shutting down... 💥");

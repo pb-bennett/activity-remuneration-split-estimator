@@ -1,158 +1,159 @@
 [
   {
-    "playerName": "Will Eagle",
-    "characterId": 95642985,
+    "playerName": "Xanden2",
     "corporationId": 98664079,
+    "characterId": 2119522072,
+    "characters": [
+      {
+        "characterId": 2119522072,
+        "corporationId": 98664079,
+        "characterName": "Xanden2"
+      },
+      {
+        "characterId": 2119726874,
+        "corporationId": 98664079,
+        "characterName": "Xanden3"
+      },
+      {
+        "characterId": 2119726819,
+        "corporationId": 98664079,
+        "characterName": "Xanden4"
+      },
+      {
+        "characterId": 2119540473,
+        "corporationId": 98664079,
+        "characterName": "Xandamaris"
+      }
+    ]
+  },
+  {
+    "playerName": "Will Eagle",
+    "corporationId": 98664079,
+    "characterId": 95642985,
     "characters": [
       {
         "characterId": 2119736087,
-        "characterName": "EagleKnight15",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "EagleKnight15"
       },
       {
         "characterId": 2122066074,
-        "characterName": "EagleKnight50",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "EagleKnight50"
       },
       {
         "characterId": 95642985,
-        "characterName": "Will Eagle",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Will Eagle"
       },
       {
         "characterId": 2121450668,
-        "characterName": "WatchTower15",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "WatchTower15"
       }
     ]
   },
   {
     "playerName": "Kyira",
-    "characterId": 889314070,
     "corporationId": 98664079,
+    "characterId": 889314070,
     "characters": [
       {
         "characterId": 889314070,
-        "characterName": "Kyira",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Kyira"
       },
       {
         "characterId": 886988979,
-        "characterName": "Kahraan",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Kahraan"
       },
       {
         "characterId": 619154305,
-        "characterName": "Kirk Starspline",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Kirk Starspline"
       }
     ]
   },
   {
+    "_id": "66084001815e880e8a285770",
     "playerName": "Drake Uitoh",
-    "characterId": 95472989,
     "corporationId": 98664079,
+    "characterId": 95472989,
     "characters": [
       {
         "characterId": 95472989,
-        "characterName": "Drake Uitoh",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Drake Uitoh"
       },
       {
         "characterId": 2122082186,
-        "characterName": "Carian Rannison",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Carian Rannison"
       },
       {
         "characterId": 2122117430,
-        "characterName": "Ambeset Artoirelle",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Ambeset Artoirelle"
       },
       {
         "characterId": 2122028867,
-        "characterName": "Kotik Otainen",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Kotik Otainen"
       },
       {
         "characterId": 2122024901,
-        "characterName": "Outoras Aivoras",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Outoras Aivoras"
       },
       {
         "characterId": 2122083791,
-        "characterName": "Pad Sertan",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Pad Sertan"
       },
       {
         "characterId": 2122119071,
-        "characterName": "Talvan Kaundur",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Talvan Kaundur"
       }
     ]
   },
   {
     "playerName": "Greun Kurt Naskingar",
-    "characterId": 2121576596,
     "corporationId": 98664079,
+    "characterId": 2121576596,
     "characters": [
       {
         "characterId": 2121576596,
-        "characterName": "Greun Kurt Naskingar",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Greun Kurt Naskingar"
       },
       {
         "characterId": 2121646241,
-        "characterName": "Ravine Nase Hamabu",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Ravine Nase Hamabu"
       }
     ]
   },
   {
     "playerName": "Dub Cyantist",
-    "characterId": 2118018399,
     "corporationId": 98664079,
+    "characterId": 2118018399,
     "characters": [
       {
         "characterId": 2118018399,
-        "characterName": "Dub Cyantist",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Dub Cyantist"
       },
       {
         "characterId": 2118414605,
-        "characterName": "Dub Pioneer",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Dub Pioneer"
       },
       {
         "characterId": 2118609744,
-        "characterName": "Dub Explorer",
-        "corporationId": 98664079
-      }
-    ]
-  },
-  {
-    "playerName": "Xanden2",
-    "characterId": 2119522072,
-    "corporationId": 98664079,
-    "characters": [
-      {
-        "characterId": 2119522072,
-        "characterName": "Xanden2",
-        "corporationId": 98664079
-      },
-      {
-        "characterId": 2119726874,
-        "characterName": "Xanden3",
-        "corporationId": 98664079
-      },
-      {
-        "characterId": 2119726819,
-        "characterName": "Xanden4",
-        "corporationId": 98664079
-      },
-      {
-        "characterId": 2119540473,
-        "characterName": "Xandamaris",
-        "corporationId": 98664079
+        "corporationId": 98664079,
+        "characterName": "Dub Explorer"
       }
     ]
   }

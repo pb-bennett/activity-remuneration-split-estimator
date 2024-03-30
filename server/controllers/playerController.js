@@ -7,14 +7,8 @@ const { checkFileExists } = require("./controllerUtils");
 
 exports.getAllPlayers = async (req, res) => {
   try {
-    const filePath = process.env.PLAYERS_DATA_FILEPATH;
-
-    // Check if the file exists
-    await checkFileExists(filePath);
-
-    // Read file and parse JSON
-    const rawPlayers = await fs.readFile(filePath, "utf8");
-    const players = JSON.parse(rawPlayers);
+    const players = await Player.find();
+    // console.log(players);
 
     // Check if players data is empty
     if (!players || players.length === 0) {
