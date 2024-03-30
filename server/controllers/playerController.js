@@ -1,8 +1,8 @@
 const fs = require("fs").promises;
+const path = require("path");
 
-// Function to check if file exists
+const { checkFileExists } = require("./controllerUtils");
 
-// Your endpoint function
 exports.getAllPlayers = async (req, res) => {
   try {
     const filePath = process.env.PLAYERS_DATA_FILEPATH;
@@ -32,24 +32,14 @@ exports.getAllPlayers = async (req, res) => {
 };
 exports.getPlayer = async (req, res) => {
   try {
-    const filePath = process.env.PLAYERS_DATA_FILEPATH;
+    const filePath = path.resolve(process.env.PLAYERS_DATA_FILEPATH);
 
     // Check if the file exists
     await checkFileExists(filePath);
+    const { result, player } = await checkPlayerExists(filePath, req.params.id);
 
-    // Read file and parse JSON
-    const rawPlayers = await fs.readFile(filePath, "utf8");
-    const players = JSON.parse(rawPlayers);
-    const player = players.find((p) => p.playerId === req.params.id);
-
-    // Check if players data is empty
-    if (!player || player.length === 0) {
-      const newError = new Error(`No player found with id ${req.params.id} in data source: ${filePath}`);
-      newError.statusCode = 404; // Set custom status code
-      throw newError;
-    }
     // Set response headers and send response
-    res.status(200).json({ result: "success", player });
+    if (result) res.status(200).json({ result: "success", player });
   } catch (error) {
     const statusCode = error.statusCode || 500;
     const errorMessage = error.message || "Internal server error";
@@ -59,13 +49,71 @@ exports.getPlayer = async (req, res) => {
   }
 };
 
-async function checkFileExists(filePath) {
+exports.addPlayer = async (req, res) => {
   try {
-    await fs.access(filePath, fs.constants.F_OK); // Check file existence
-    return true; // File exists
+    const filePath = path.resolve(process.env.PLAYERS_DATA_FILEPATH);
+    // Check if the file exists
+    await checkFileExists(filePath);
+    // Read file and parse JSON
+    const { result, player, players } = await checkPlayerExists(filePath, req.body.player.playerName, true);
+    // Add player
+    if (player.length !== 0) {
+      const newError = new Error(`Player with name ${req.body.player.playerName} already exists in data source: ${filePath}`);
+      newError.statusCode = 409; // Conflict status code
+      throw newError;
+    }
+    const newPlayers = [...players, req.body.player];
+    // Write updated data to file
+    await fs.writeFile(filePath, JSON.stringify(newPlayers, null, 2));
+    res.status(200).json({ result: "success", player: req.body.player });
   } catch (error) {
-    const newError = new Error(`Players data file not found: ${filePath}`);
-    newError.statusCode = 404; // Set custom status code
+    const statusCode = error.statusCode || 500;
+    const errorMessage = error.message || "Internal server error";
+    // Handle other errors
+    res.status(statusCode).send({ result: "fail", error: errorMessage });
+  }
+};
+
+exports.updatePlayer = async (req, res) => {
+  try {
+    const filePath = path.resolve(process.env.PLAYERS_DATA_FILEPATH);
+    // Check if the file exists
+    await checkFileExists(filePath);
+    // Read file and parse JSON
+    const { result, player, players } = await checkPlayerExists(filePath, req.params.id);
+
+    // Update player
+    let newPlayers = players.filter((p) => p.playerId !== player.playerId);
+    newPlayers = [...newPlayers, req.body.player];
+    // Write updated data to file
+    await fs.writeFile(filePath, JSON.stringify(newPlayers, null, 2));
+    res.status(200).json({ result: "success", player: req.body.player });
+  } catch (error) {
+    const statusCode = error.statusCode || 500;
+    const errorMessage = error.message || "Internal server error";
+    // Handle other errors
+    res.status(statusCode).send({ result: "fail", error: errorMessage });
+  }
+};
+
+const checkPlayerExists = async (filePath, identifier, add = false) => {
+  const rawPlayers = await fs.readFile(filePath, "utf8");
+  const players = JSON.parse(rawPlayers);
+  const player = !add ? players.filter((p) => p.playerId === identifier) : players.filter((p) => p.playerName === identifier);
+  console.log(player, add);
+  // Check if player is not found
+
+  if (!player && !add) {
+    const newError = new Error(`No player found with name ${identifier} in data source: ${filePath}`);
+    newError.statusCode = 404; // Not found status code
     throw newError;
   }
-}
+
+  if (player && add) {
+    const newError = new Error(`Player with name ${identifier} already exists in data source: ${filePath}`);
+    newError.statusCode = 409; // Conflict status code
+    throw newError;
+  }
+
+  return { result: true, player: player[0], players };
+};

@@ -1,25 +1,47 @@
 const express = require("express");
-require("dotenv").config();
-const bodyParser = require("body-parser");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
 const app = express();
-const port = process.env.PORT || 3500;
+const xss = require("xss-clean");
+const mongoSanitize = require("express-mongo-sanitize");
+
 const path = require("path");
 const playerRoutes = require("./routes/playerRoutes");
 const characterRoutes = require("./routes/characterRoutes");
 const operationRoutes = require("./routes/operationRoutes");
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(helmet());
+
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 
 // const cors = require("cors");
 // const router = require("./router");
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 2 * 60 * 1000,
+  message: "Too many requests from this IP, please try again in an 2 minutes!",
+});
+app.use("/api", limiter);
+
+// Body parser, reading data from body into req.body
+app.use(express.json({ limit: "30kb" }));
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+// Data sanitization against XSS
+app.use(xss());
+
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api/v1/players", playerRoutes);
 app.use("/api/v1/characters", characterRoutes);
 app.use("/api/v1/operations", operationRoutes);
 
-app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`Listening on port ${port}`);
+// });
+
+module.exports = app;
