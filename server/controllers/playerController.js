@@ -1,10 +1,5 @@
-const fs = require("fs").promises;
-const path = require("path");
 const mongoose = require("mongoose");
-
 const Player = require("../models/playerModel");
-
-const { checkFileExists } = require("./controllerUtils");
 
 exports.getAllPlayers = async (req, res) => {
   try {

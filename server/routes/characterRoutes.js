@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { getCharacters, updateCharacterFromSource } = require("../controllers/characterController");
+const { getAllCharacters, updateCharacterFromSource } = require("../controllers/characterController");
 
-router.get("/", getCharacters);
+router.route("/").get(getAllCharacters);
 
 router.route("/update-db").post(updateCharacterFromSource);
 

@@ -2998,6 +2998,10 @@ $(document).ready(function () {
     $("#exampleModal").modal("show");
   });
 
+  $("#utilityBtn").click(function () {
+    const opJson = JSON.stringify(miningOp);
+    console.log(opJson);
+  });
   // Function to close modal
   // $(".modal").on("click", "[data-bs-dismiss='modal']", function (event) {
   //   event.stopPropagation();

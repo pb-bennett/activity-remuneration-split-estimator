@@ -1,11 +1,11 @@
 const Character = require("../models/characterModel");
 
-exports.getCharacters = async (req, res) => {
+exports.getAllCharacters = async (req, res) => {
   try {
     const cosmosCharacters = await Character.find(req.body);
     if (!cosmosCharacters || cosmosCharacters.length === 0) {
       const newError = new Error("No characters found.");
-      newError.statusCode = 404; // Set custom status code
+      newError.statusCode = 404;
       throw newError;
     }
     res.status(200).send({ result: "success", length: cosmosCharacters.length, data: cosmosCharacters });
