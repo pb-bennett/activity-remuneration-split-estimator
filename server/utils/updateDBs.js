@@ -8,7 +8,7 @@ exports.updateCharactersDB = async () => {
   try {
     const url = process.env.EVE_WHO_CORP_API_URL;
     const corpsIds = [98664079, 98657953];
-
+    const characters = [];
     for (const corpId of corpsIds) {
       console.log(`${url}${corpId}`);
       const rawMembers = await fetch(`${url}${corpId}`);
@@ -21,10 +21,10 @@ exports.updateCharactersDB = async () => {
           corporationId: corpId,
         };
       });
-      await Character.deleteMany({});
-      await Character.insertMany(members);
-      console.log(members);
+      characters.push(...members);
     }
+    await Character.deleteMany({});
+    await Character.insertMany(characters);
   } catch (error) {
     console.error(error);
   }

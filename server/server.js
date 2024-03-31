@@ -18,7 +18,7 @@ mongoose
   })
   .then(() => {
     // resetPlayersDB();
-    // updateCharactersDB();
+    updateCharactersDB();
   });
 
 process.on("unhandledRejection", (err) => {

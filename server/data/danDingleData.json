@@ -1,0 +1,50 @@
+[
+  {
+    "player": {
+      "playerName": "Dan Dingle",
+      "corporationId": 98664079,
+      "characterId": 2116955463,
+      "characters": [
+        {
+          "characterId": 2116955463,
+          "corporationId": 98664079,
+          "characterName": "Dan Dingle"
+        },
+        {
+          "characterId": 2117908234,
+          "corporationId": 98664079,
+          "characterName": "Dan Dingle II"
+        },
+        {
+          "characterId": 2117990694,
+          "corporationId": 98664079,
+          "characterName": "Joe McFungus"
+        }
+      ]
+    }
+  },
+  {
+    "player": {
+      "playerName": "Dub Cyantist",
+      "characterId": 2118018399,
+      "corporationId": 98664079,
+      "characters": [
+        {
+          "characterId": 2118018399,
+          "characterName": "Dub Cyantist",
+          "corporationId": 98664079
+        },
+        {
+          "characterId": 2118414605,
+          "characterName": "Dub Pioneer",
+          "corporationId": 98664079
+        },
+        {
+          "characterId": 2118609744,
+          "characterName": "Dub Explorer",
+          "corporationId": 98664079
+        }
+      ]
+    }
+  }
+]
