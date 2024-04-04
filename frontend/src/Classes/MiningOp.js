@@ -5,16 +5,16 @@ import SplitOp from "./SplitOp.js";
 import BtnHandler from "./BtnHandler.js";
 
 class MiningOp {
-  constructor(fleetLeader, fleetName, startTime, reload = false) {
-    this.fleetLeader = fleetLeader;
-    this.fleetName = fleetName;
+  constructor(opData, reload = false) {
+    this.fleetLeader = opData.fc.playerName;
+    this.fleetName = opData.fleetName;
     this.startTime = new Date(startTime);
     this.playerMembers = [];
     if (!reload) this.addPlayerMember(fleetLeader);
     this.htmlBuilder = new HtmlBuilder();
     this.isActive = false;
     this.hasBeenActive = false;
-    this.id = self.crypto.randomUUID();
+    // this.id = self.crypto.randomUUID();
     this.splitOp = new SplitOp();
     this.timerRefreshInterval = setInterval(() => {
       this.timerRender();
@@ -23,6 +23,24 @@ class MiningOp {
       btnHandler(event.target);
     });
   }
+  // constructor(fleetLeader, fleetName, startTime, reload = false) {
+  //   this.fleetLeader = fleetLeader;
+  //   this.fleetName = fleetName;
+  //   this.startTime = new Date(startTime);
+  //   this.playerMembers = [];
+  //   if (!reload) this.addPlayerMember(fleetLeader);
+  //   this.htmlBuilder = new HtmlBuilder();
+  //   this.isActive = false;
+  //   this.hasBeenActive = false;
+  //   // this.id = self.crypto.randomUUID();
+  //   this.splitOp = new SplitOp();
+  //   this.timerRefreshInterval = setInterval(() => {
+  //     this.timerRender();
+  //   }, 1000);
+  //   $(".ars-btn").on("click", (event) => {
+  //     btnHandler(event.target);
+  //   });
+  // }
   timerRender() {
     $(".timer").each((index, element) => {
       const workTimeIds = this.getIds(element);
@@ -148,6 +166,11 @@ class MiningOp {
   split() {
     return this.splitOp.split(this);
   }
+
+  // static buildNewOp(opData) {{
+
+  // }}
+
   static loadMiningOp(parsedMiningOp) {
     const miningOp = new MiningOp(parsedMiningOp.fleetLeader, parsedMiningOp.fleetName, parsedMiningOp.startTime, true);
     miningOp.playerMembers = parsedMiningOp.playerMembers.map((playerData) => {

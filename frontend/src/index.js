@@ -14,7 +14,8 @@ $(document).ready(function () {
 
   $("#utilityBtn").click(function () {
     const opJson = JSON.stringify(miningOp);
-    console.log(opJson);
+    const opObj = JSON.parse(opJson);
+    console.log(opObj);
   });
   // Function to close modal
   // $(".modal").on("click", "[data-bs-dismiss='modal']", function (event) {
@@ -23,13 +24,16 @@ $(document).ready(function () {
   // });
 
   flatpickr("#datepicker", datePickerOptions);
-  $("#showDetails").on("click", (event) => {
+  $("#loadDemoOp").on("click", (event) => {
     miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
     $("#mainContainer").html(miningOp.buildHtml());
 
     $(".ars-btn").on("click", (event) => {
       btnHandler(event.target);
     });
+  });
+  $("#utilityBtn2").on("click", (event) => {
+    buildOp(event.target);
   });
 
   // $("#openModalButton").click(function () {
@@ -106,3 +110,20 @@ const fetchCharacterData = async () => {
 //   $("#mainContainer").html(miningOp.buildHtml());
 //   // const miningOpJson = JSON.stringify(miningOp);
 // });
+
+const buildOp = async (target) => {
+  try {
+    const rawCharacters = await fetch("http://localhost:3500/api/v1/characters");
+    const characters = await rawCharacters.json();
+    const rawPlayers = await fetch("http://localhost:3500/api/v1/players");
+    const players = await rawPlayers.json();
+    console.log(players.players);
+    const newOp = { fc: players.players[1], fleetName: "Eagle Fleet", players: [players.players[2], players.players[0]] };
+    console.log(newOp);
+    miningOp = MiningOp.buildNewOp(newOp);
+    // console.log(characters);
+    console.log(players);
+  } catch (error) {
+    console.error(error);
+  }
+};

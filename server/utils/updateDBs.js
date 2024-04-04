@@ -14,6 +14,7 @@ exports.updateCharactersDB = async () => {
       const rawMembers = await fetch(`${url}${corpId}`);
       const membersObj = await rawMembers.json();
       // console.log(membersObj);
+      console.log("WHATS IS GOING ON???????????????????????????????");
       const members = membersObj.characters.map((member) => {
         return {
           characterId: member.character_id,

@@ -19,5 +19,10 @@
     "mongoose": "^8.2.4",
     "morgan": "^1.10.0",
     "xss-clean": "^0.1.4"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "public/"
+    ]
   }
 }

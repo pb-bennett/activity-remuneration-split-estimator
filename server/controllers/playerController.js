@@ -9,11 +9,11 @@ exports.getAllPlayers = async (req, res) => {
       newError.statusCode = 404; // Set custom status code
       throw newError;
     }
-    res.status(200).json({ result: "success", players });
+    res.status(200).json({ status: "success", players });
   } catch (error) {
     const statusCode = error.statusCode || 500;
     const errorMessage = error.message || "Internal server error";
-    res.status(statusCode).send({ result: "fail", error: errorMessage });
+    res.status(statusCode).send({ status: "fail", error: errorMessage });
   }
 };
 exports.getPlayer = async (req, res) => {
@@ -22,18 +22,18 @@ exports.getPlayer = async (req, res) => {
     // Validate if playerId is a valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(playerId)) {
       const errorMessage = "Invalid player ID format";
-      return res.status(400).json({ result: "fail", error: errorMessage });
+      return res.status(400).json({ status: "fail", error: errorMessage });
     }
     const player = await Player.findById(playerId);
     if (!player) {
       const errorMessage = `Player with ID ${playerId} not found.`;
-      return res.status(404).json({ result: "fail", error: errorMessage });
+      return res.status(404).json({ status: "fail", error: errorMessage });
     }
-    res.status(200).json({ result: "success", player });
+    res.status(200).json({ status: "success", player });
   } catch (error) {
     const statusCode = error.statusCode || 500;
     const errorMessage = error.message || "Internal server error";
-    res.status(statusCode).send({ result: "fail", error: errorMessage });
+    res.status(statusCode).send({ status: "fail", error: errorMessage });
   }
 };
 
@@ -45,16 +45,16 @@ exports.createPlayer = async (req, res) => {
     // console.log(existingPlayer);
     if (existingPlayer) {
       const errorMessage = `Player with name ${newPlayer.playerName} already exists.`;
-      return res.status(404).json({ result: "fail", error: errorMessage });
+      return res.status(404).json({ status: "fail", error: errorMessage });
     }
     // const newPlayer = req.body.player;
     const result = await Player.create(newPlayer);
-    res.status(200).json({ result: "success", player: result });
+    res.status(200).json({ status: "success", player: result });
   } catch (error) {
     const statusCode = error.statusCode || 500;
     const errorMessage = error.message || "Internal server error";
     // Handle other errors
-    res.status(statusCode).send({ result: "fail", error: errorMessage, stackTrace: error.stack });
+    res.status(statusCode).send({ status: "fail", error: errorMessage, stackTrace: error.stack });
   }
 };
 

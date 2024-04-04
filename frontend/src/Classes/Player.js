@@ -3,16 +3,16 @@
 import Character from "./Character.js";
 
 class Player {
-  constructor(playerName, reload = false) {
-    this.playerName = playerName;
+  constructor(player, reload = false) {
+    this.playerName = player.playerName;
     this.characters = [];
-    if (!reload) this.addCharacter(playerName);
+    if (!reload) this.addCharacter(player);
     this.isActive = false;
-    this.id = self.crypto.randomUUID();
+    this.id = player._id;
   }
   addCharacter(character) {
-    const newCharacter = prompt("Enter character name", character);
-    this.characters.push(new Character(newCharacter));
+    // const newCharacter = prompt("Enter character name", character);
+    this.characters.push(new Character(character));
   }
   getCharacter(characterId) {
     return this.characters.filter((character) => character.id === characterId)[0];

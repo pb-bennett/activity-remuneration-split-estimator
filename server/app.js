@@ -5,12 +5,14 @@ const rateLimit = require("express-rate-limit");
 const app = express();
 const xss = require("xss-clean");
 const mongoSanitize = require("express-mongo-sanitize");
+const cors = require("cors");
 
 const path = require("path");
 const playerRoutes = require("./routes/playerRoutes");
 const characterRoutes = require("./routes/characterRoutes");
 const operationRoutes = require("./routes/operationRoutes");
 
+app.use(cors());
 app.use(helmet());
 
 if (process.env.NODE_ENV === "development") {
