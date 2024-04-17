@@ -1,12 +1,11 @@
 import flatpickr from "flatpickr";
 
 import MiningOp from "./Classes/MiningOp.js";
-import { datePickerOptions } from "./options.js";
-import { opJSON } from "./data.js";
+import NewPlayer from "./Classes/NewPlayer.js";
+import { datePickerOptions, characterUrlFinder } from "./options.js";
 
 let miningOp;
 // let refreshInterval;
-
 $(document).ready(function () {
   $("#openModalBtn").click(function () {
     $("#exampleModal").modal("show");
@@ -17,46 +16,14 @@ $(document).ready(function () {
     const opObj = JSON.parse(opJson);
     console.log(opObj);
   });
-  // Function to close modal
-  // $(".modal").on("click", "[data-bs-dismiss='modal']", function (event) {
-  //   event.stopPropagation();
-  //   $(this).closest(".modal").modal("hide");
-  // });
 
   flatpickr("#datepicker", datePickerOptions);
   $("#loadDemoOp").on("click", (event) => {
-    miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
-    $("#mainContainer").html(miningOp.buildHtml());
-
-    $(".ars-btn").on("click", (event) => {
-      btnHandler(event.target);
-    });
+    const newPlayer = new NewPlayer(miningOp);
   });
   $("#utilityBtn2").on("click", (event) => {
     buildOp(event.target);
   });
-
-  // $("#openModalButton").click(function () {
-  //   // Replace this with your dynamic content generation logic
-  //   var dynamicContent = "<p>This is some dynamic content.</p>";
-  //   dynamicContent += "<p>This content is generated dynamically.</p>";
-
-  //   // Set the dynamic content to the modal body
-  //   $("#modalBody").html(dynamicContent);
-
-  //   // Show the modal
-  //   $("#exampleModal").modal("show");
-  // });
-  // refreshInterval = setInterval(() => {
-  //   if (miningOp.fleetName) {
-  //     $("#mainContainer").html(miningOp.buildHtml());
-  //     $(".ars-btn").on("click", (event) => {
-  //       btnHandler(event.target);
-  //     });
-  //   }
-  // }, 1000);
-
-  // fetchCharacterData();
 });
 
 const btnHandler = (target) => {
@@ -74,6 +41,9 @@ const btnHandler = (target) => {
   $("#mainContainer").html(miningOp.buildHtml());
   $(".ars-btn").on("click", (event) => {
     btnHandler(event.target);
+  });
+  $('[data-toggle="tooltip"]').tooltip({
+    delay: { show: 100, hide: 500 },
   });
 };
 const opDelete = () => {
@@ -97,32 +67,24 @@ const fetchCharacterData = async () => {
   }
 };
 
-// $("#newFleetForm").on("submit", (event) => {
-//   event.preventDefault();
-
-//   if (!miningOp?.fleetName) miningOp = new MiningOp($("#fleetLeaderInput").val(), $("#fleetNameInput").val(), $("#datepicker").val());
-//   clearInterval(refreshInterval);
-//   // miningOp.addPlayerMember("Kyira");
-//   // miningOp.playerMembers.filter((p) => p.playerName === "Kyira")[0].addCharacter("Kahraan");
-//   $(newFleetModal).modal("hide");
-//   $("#newFleetModalBtn").prop("disabled", true);
-//   $("#showDetails").prop("disabled", false);
-//   $("#mainContainer").html(miningOp.buildHtml());
-//   // const miningOpJson = JSON.stringify(miningOp);
-// });
-
 const buildOp = async (target) => {
   try {
     const rawCharacters = await fetch("http://localhost:3500/api/v1/characters");
     const characters = await rawCharacters.json();
     const rawPlayers = await fetch("http://localhost:3500/api/v1/players");
     const players = await rawPlayers.json();
-    console.log(players.players);
-    const newOp = { fc: players.players[1], fleetName: "Eagle Fleet", players: [players.players[2], players.players[0]] };
-    console.log(newOp);
-    miningOp = MiningOp.buildNewOp(newOp);
+    // console.log(players.data);
+    const newOp = { fc: players.data[0], fleetName: "Eagle Fleet", startTime: new Date(), players: [players.data[4], players.data[1]] };
+    // console.log(newOp);
+    miningOp = new MiningOp(newOp);
+    // console.log("MININGOP::::", miningOp);
     // console.log(characters);
-    console.log(players);
+    // console.log(players);
+    $("#mainContainer").html(miningOp.buildHtml());
+
+    $(".ars-btn").on("click", (event) => {
+      btnHandler(event.target);
+    });
   } catch (error) {
     console.error(error);
   }

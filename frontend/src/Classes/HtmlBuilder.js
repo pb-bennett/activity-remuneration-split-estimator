@@ -98,8 +98,8 @@ class HtmlBuilder {
         <img src="./img/${character.isActive ? "pause" : "play"}.svg"  alt="pause icon" />
       </a>
       <div>Work-Time: <span class="timer" data-timertype="characterWorkTime">${this.formatTime(character.workTime())}</span></div>
-      <a href="#" class="ars-btn character-delete-btn p-1 character-btn" data-btnScope="character" data-btnType="delete">
-        <img src="./img/trash.svg"  alt="pause icon" />
+    <a href="#" class="ars-btn character-delete-btn p-1 character-btn" data-btnScope="character" data-btnType="delete">
+    <img src="./img/trash.svg"  alt="pause icon" />
       </a>
     </div>
   </div>

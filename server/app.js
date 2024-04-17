@@ -11,6 +11,7 @@ const path = require("path");
 const playerRoutes = require("./routes/playerRoutes");
 const characterRoutes = require("./routes/characterRoutes");
 const operationRoutes = require("./routes/operationRoutes");
+const databaseUpdateRouter = require("./routes/databaseUpdateRoutes");
 
 app.use(cors());
 app.use(helmet());
@@ -41,6 +42,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/v1/players", playerRoutes);
 app.use("/api/v1/characters", characterRoutes);
 app.use("/api/v1/operations", operationRoutes);
+app.use("/api/v1/db-update", databaseUpdateRouter);
 
 // app.listen(port, () => {
 //   console.log(`Listening on port ${port}`);

@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 const Player = require("../models/playerModel");
+const SeatUser = require("../models/seatUserModel");
+
+const seatToken = process.env.SEAT_TOKEN;
+const seatUrl = process.env.SEAT_URL;
 
 exports.getAllPlayers = async (req, res) => {
   try {
@@ -9,7 +13,7 @@ exports.getAllPlayers = async (req, res) => {
       newError.statusCode = 404; // Set custom status code
       throw newError;
     }
-    res.status(200).json({ status: "success", players });
+    res.status(200).json({ status: "success", data: players });
   } catch (error) {
     const statusCode = error.statusCode || 500;
     const errorMessage = error.message || "Internal server error";
@@ -29,7 +33,7 @@ exports.getPlayer = async (req, res) => {
       const errorMessage = `Player with ID ${playerId} not found.`;
       return res.status(404).json({ status: "fail", error: errorMessage });
     }
-    res.status(200).json({ status: "success", player });
+    res.status(200).json({ status: "success", data: player });
   } catch (error) {
     const statusCode = error.statusCode || 500;
     const errorMessage = error.message || "Internal server error";

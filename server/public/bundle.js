@@ -2564,7 +2564,8 @@ class Character {
     this.activityPeriods = [];
     this.joinTime = new Date();
     this.periodStartTime = null;
-    this.id = character._id;
+    this.id = character.characterId;
+    // this.characterId = character.characterId;
   }
   pause() {
     this.isActive = false;
@@ -2601,9 +2602,11 @@ class Player {
   constructor(player, reload = false) {
     this.playerName = player.playerName;
     this.characters = [];
-    if (!reload) this.addCharacter(player);
+    // if (!reload) this.addCharacter(player);
+    if (!reload && player.characters.length > 0) player.characters.forEach((character) => this.characters.push(new Character(character)));
     this.isActive = false;
-    this.id = player._id;
+    this.id = player.characterId;
+    this.characterId = player.characterId;
   }
   addCharacter(character) {
     // const newCharacter = prompt("Enter character name", character);
@@ -2734,8 +2737,8 @@ class HtmlBuilder {
         <img src="./img/${character.isActive ? "pause" : "play"}.svg"  alt="pause icon" />
       </a>
       <div>Work-Time: <span class="timer" data-timertype="characterWorkTime">${this.formatTime(character.workTime())}</span></div>
-      <a href="#" class="ars-btn character-delete-btn p-1 character-btn" data-btnScope="character" data-btnType="delete">
-        <img src="./img/trash.svg"  alt="pause icon" />
+    <a href="#" class="ars-btn character-delete-btn p-1 character-btn" data-btnScope="character" data-btnType="delete">
+    <img src="./img/trash.svg"  alt="pause icon" />
       </a>
     </div>
   </div>
@@ -2809,17 +2812,89 @@ class BtnHandler {
   }
 }
 
+class NewPlayer {
+  constructor(existingOp) {
+    // Call the async method fetchPlayerList within the constructor
+    this.existingPlayers = this.isMiningOp(existingOp) ? existingOp.playerMembers : [];
+    console.log(this.existingPlayers);
+    this.fetchPlayerList();
+
+    this.fetchCharacterList()
+      .then((characterList) => {
+        this.characterlist = characterList.data; // Assign the fetched player list to the property
+      })
+      .catch((error) => {
+        console.error("Failed to fetch player list:", error);
+      });
+
+    $("#exampleModal").modal("show");
+  }
+
+  async fetchPlayerList() {
+    try {
+      const rawPlayerList = await fetch("http://localhost:3500/api/v1/players");
+      const playerList = await rawPlayerList.json();
+      // this.playerList = playerList.data;
+      const currentPlayerIds = this.existingPlayers.map((player) => player.characterId);
+      console.log(currentPlayerIds);
+      this.playerList = playerList.data.filter((player) => !currentPlayerIds.includes(player.characterId));
+      // console.log(trimmedPlayerList);
+
+      this.populateModal();
+    } catch (error) {
+      console.error("Error fetching player list:", error);
+      throw error; // Rethrow the error to propagate it to the caller
+    }
+  }
+  async fetchCharacterList() {
+    try {
+      const rawCharacterList = await fetch("http://localhost:3500/api/v1/characters");
+      const characterList = await rawCharacterList.json();
+
+      return characterList;
+    } catch (error) {
+      console.error("Error fetching character list:", error);
+      throw error; // Rethrow the error to propagate it to the caller
+    }
+  }
+  populateModal() {
+    // Clear the modal body
+    $("#exampleModal .modal-body").empty();
+    // Populate the modal with the player list contents
+    this.playerList.forEach((player) => {
+      // Append player data to the modal body, adjust this according to your modal structure
+      $("#exampleModal .modal-body").append(`<div>${player.playerName}</div>`);
+    });
+
+    // Show the modal after populating it with data
+    $("#exampleModal").modal("show");
+  }
+  isMiningOp(op) {
+    if (typeof op !== "object" || op == null) {
+      return false;
+    }
+    console.log("step1done");
+    for (let key in op) {
+      if (op.hasOwnProperty(key)) {
+        return true;
+      }
+      return false;
+    }
+  }
+}
+
 class MiningOp {
   constructor(opData, reload = false) {
     this.fleetLeader = opData.fc.playerName;
     this.fleetName = opData.fleetName;
-    this.startTime = new Date(startTime);
+    this.startTime = new Date(opData.startTime);
     this.playerMembers = [];
-    if (!reload) this.addPlayerMember(fleetLeader);
+    if (!reload) this.playerMembers.push(new Player(opData.fc));
+    if (!reload && opData.players.length > 0) opData.players.forEach((player) => this.playerMembers.push(new Player(player)));
     this.htmlBuilder = new HtmlBuilder();
     this.isActive = false;
     this.hasBeenActive = false;
-    // this.id = self.crypto.randomUUID();
+    this.id = self.crypto.randomUUID();
     this.splitOp = new SplitOp();
     this.timerRefreshInterval = setInterval(() => {
       this.timerRender();
@@ -2828,24 +2903,7 @@ class MiningOp {
       btnHandler(event.target);
     });
   }
-  // constructor(fleetLeader, fleetName, startTime, reload = false) {
-  //   this.fleetLeader = fleetLeader;
-  //   this.fleetName = fleetName;
-  //   this.startTime = new Date(startTime);
-  //   this.playerMembers = [];
-  //   if (!reload) this.addPlayerMember(fleetLeader);
-  //   this.htmlBuilder = new HtmlBuilder();
-  //   this.isActive = false;
-  //   this.hasBeenActive = false;
-  //   // this.id = self.crypto.randomUUID();
-  //   this.splitOp = new SplitOp();
-  //   this.timerRefreshInterval = setInterval(() => {
-  //     this.timerRender();
-  //   }, 1000);
-  //   $(".ars-btn").on("click", (event) => {
-  //     btnHandler(event.target);
-  //   });
-  // }
+
   timerRender() {
     $(".timer").each((index, element) => {
       const workTimeIds = this.getIds(element);
@@ -2891,9 +2949,10 @@ class MiningOp {
   showDetails() {
     console.log(this.fleetLeader, this.fleetName, this.startTime);
   }
-  addPlayerMember() {
-    const newPlayer = prompt("Enter player name");
-    if (newPlayer) this.playerMembers.push(new Player(newPlayer));
+  addPlayerMember(newPlayer) {
+    // const newPlayer = prompt("Enter player name");
+    new NewPlayer(this);
+    // this.playerMembers.push(new Player(newPlayer));
   }
   getPlayer(playerId) {
     return this.playerMembers.filter((player) => player.id === playerId)[0];
@@ -3011,11 +3070,8 @@ const datePickerOptions = {
   time_24hr: true,
 };
 
-const opJSON = `{"fleetLeader":"Bob Eagle","fleetName":"Eagle Fleet","startTime":"2024-03-16T13:44:00.000Z","playerMembers":[{"playerName":"Bob Eagle","characters":[{"characterName":"Bob Eagle","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"154f8a7a-4ae9-4d77-972f-ecc73708eb0d"}],"isActive":false,"id":"ad20d3c0-9b93-434a-ac4e-505ebf0f391b"},{"playerName":"Kyira","characters":[{"characterName":"Kyira","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"505d826a-dd79-4e2e-a54e-6d00924ce1fe"},{"characterName":"Kahraan","isActive":false,"hasBeenActive":false,"forcePause":false,"activityPeriods":[],"joinTime":"2024-03-16T13:44:31.588Z","periodStartTime":null,"id":"457a7fa5-3ffc-45af-a4af-79e5b383c4f9"}],"isActive":false,"id":"e551cb55-2e51-4cf5-a99f-fed33d871ae9"}],"htmlBuilder":{},"isActive":false,"id":"9bcaa53d-302b-4ce2-8381-1b510b29b2e1"}`;
-
 let miningOp;
 // let refreshInterval;
-
 $(document).ready(function () {
   $("#openModalBtn").click(function () {
     $("#exampleModal").modal("show");
@@ -3026,46 +3082,14 @@ $(document).ready(function () {
     const opObj = JSON.parse(opJson);
     console.log(opObj);
   });
-  // Function to close modal
-  // $(".modal").on("click", "[data-bs-dismiss='modal']", function (event) {
-  //   event.stopPropagation();
-  //   $(this).closest(".modal").modal("hide");
-  // });
 
   flatpickr("#datepicker", datePickerOptions);
   $("#loadDemoOp").on("click", (event) => {
-    miningOp = MiningOp.loadMiningOp(JSON.parse(opJSON));
-    $("#mainContainer").html(miningOp.buildHtml());
-
-    $(".ars-btn").on("click", (event) => {
-      btnHandler$1(event.target);
-    });
+    new NewPlayer(miningOp);
   });
   $("#utilityBtn2").on("click", (event) => {
     buildOp(event.target);
   });
-
-  // $("#openModalButton").click(function () {
-  //   // Replace this with your dynamic content generation logic
-  //   var dynamicContent = "<p>This is some dynamic content.</p>";
-  //   dynamicContent += "<p>This content is generated dynamically.</p>";
-
-  //   // Set the dynamic content to the modal body
-  //   $("#modalBody").html(dynamicContent);
-
-  //   // Show the modal
-  //   $("#exampleModal").modal("show");
-  // });
-  // refreshInterval = setInterval(() => {
-  //   if (miningOp.fleetName) {
-  //     $("#mainContainer").html(miningOp.buildHtml());
-  //     $(".ars-btn").on("click", (event) => {
-  //       btnHandler(event.target);
-  //     });
-  //   }
-  // }, 1000);
-
-  // fetchCharacterData();
 });
 
 const btnHandler$1 = (target) => {
@@ -3084,6 +3108,9 @@ const btnHandler$1 = (target) => {
   $(".ars-btn").on("click", (event) => {
     btnHandler$1(event.target);
   });
+  $('[data-toggle="tooltip"]').tooltip({
+    delay: { show: 100, hide: 500 },
+  });
 };
 const opDelete = () => {
   const confirmation = confirm(`Are you sure you want to delete ${miningOp.fleetName}?`);
@@ -3095,32 +3122,24 @@ const opDelete = () => {
   }
 };
 
-// $("#newFleetForm").on("submit", (event) => {
-//   event.preventDefault();
-
-//   if (!miningOp?.fleetName) miningOp = new MiningOp($("#fleetLeaderInput").val(), $("#fleetNameInput").val(), $("#datepicker").val());
-//   clearInterval(refreshInterval);
-//   // miningOp.addPlayerMember("Kyira");
-//   // miningOp.playerMembers.filter((p) => p.playerName === "Kyira")[0].addCharacter("Kahraan");
-//   $(newFleetModal).modal("hide");
-//   $("#newFleetModalBtn").prop("disabled", true);
-//   $("#showDetails").prop("disabled", false);
-//   $("#mainContainer").html(miningOp.buildHtml());
-//   // const miningOpJson = JSON.stringify(miningOp);
-// });
-
 const buildOp = async (target) => {
   try {
     const rawCharacters = await fetch("http://localhost:3500/api/v1/characters");
     const characters = await rawCharacters.json();
     const rawPlayers = await fetch("http://localhost:3500/api/v1/players");
     const players = await rawPlayers.json();
-    console.log(players.players);
-    const newOp = { fc: players.players[1], fleetName: "Eagle Fleet", players: [players.players[2], players.players[0]] };
-    console.log(newOp);
-    miningOp = MiningOp.buildNewOp(newOp);
+    // console.log(players.data);
+    const newOp = { fc: players.data[0], fleetName: "Eagle Fleet", startTime: new Date(), players: [players.data[4], players.data[1]] };
+    // console.log(newOp);
+    miningOp = new MiningOp(newOp);
+    // console.log("MININGOP::::", miningOp);
     // console.log(characters);
-    console.log(players);
+    // console.log(players);
+    $("#mainContainer").html(miningOp.buildHtml());
+
+    $(".ars-btn").on("click", (event) => {
+      btnHandler$1(event.target);
+    });
   } catch (error) {
     console.error(error);
   }

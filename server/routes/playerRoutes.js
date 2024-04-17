@@ -4,5 +4,6 @@ const { getAllPlayers, getPlayer, updatePlayer, createPlayer } = require("../con
 
 router.route("/").get(getAllPlayers).post(createPlayer);
 router.route("/:id").get(getPlayer).put(updatePlayer);
+// router.route("/update-db-seat").post(updateSeatUserDb)s;
 
 module.exports = router;

@@ -9,7 +9,8 @@ class Character {
     this.activityPeriods = [];
     this.joinTime = new Date();
     this.periodStartTime = null;
-    this.id = character._id;
+    this.id = character.characterId;
+    // this.characterId = character.characterId;
   }
   pause() {
     this.isActive = false;

@@ -6,9 +6,11 @@ class Player {
   constructor(player, reload = false) {
     this.playerName = player.playerName;
     this.characters = [];
-    if (!reload) this.addCharacter(player);
+    // if (!reload) this.addCharacter(player);
+    if (!reload && player.characters.length > 0) player.characters.forEach((character) => this.characters.push(new Character(character)));
     this.isActive = false;
-    this.id = player._id;
+    this.id = player.characterId;
+    this.characterId = player.characterId;
   }
   addCharacter(character) {
     // const newCharacter = prompt("Enter character name", character);
