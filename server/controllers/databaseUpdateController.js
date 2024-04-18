@@ -8,7 +8,7 @@ const seatUrl = process.env.SEAT_URL;
 
 exports.updateSeatDb = async (req, res) => {
   try {
-    if (!req.body.confirm) {
+    if (!req.body.confirm || req.body.confirm) {
       const newError = new Error("No confirmation received.");
       newError.statusCode = 400; // Set custom status code
       throw newError;
@@ -29,7 +29,12 @@ exports.updateSeatDb = async (req, res) => {
       seatFetchData = [...seatFetchData, ...seatFetch.data];
       currentSeatPage++;
     }
-
+    if (!seatFetchData || seatFetchData.length === 0) {
+      const newError = new Error("No characters found.");
+      newError.statusCode = 404;
+      throw newError;
+    }
+    SeatUser.deleteMany({});
     const dbResult = await SeatUser.insertMany(seatFetchData);
     console.log(seatFetchData);
 
@@ -98,12 +103,37 @@ exports.updatePlayerDatabase = async (req, res) => {
       throw newError;
     }
     const seatUserList = await SeatUser.find();
+    const cosmosCharacterList = await Character.find();
+    const cosmosCharacterIdList = cosmosCharacterList.map((c) => c.characterId);
+    let cosmosPlayers = [];
 
-    res.status(200).json({ result: "success", length: seatUserList.length, data: seatUserList });
+    seatUserList.forEach((user) => {
+      if (cosmosCharacterIdList.includes(user.main_character_id)) {
+        cosmosPlayers = [...cosmosPlayers, userToPlayer(user, cosmosCharacterIdList, cosmosCharacterList)];
+      }
+      if (!cosmosCharacterIdList.includes(user.main_character_id) && user.associated_character_ids.some((characterId) => cosmosCharacterIdList.includes(characterId))) {
+        cosmosPlayers = [...cosmosPlayers, userToPlayer(user, cosmosCharacterIdList, cosmosCharacterList, false)];
+      }
+    });
+    res.status(200).json({ result: "success", length: cosmosPlayers.length, data: cosmosPlayers });
   } catch (error) {
     const statusCode = error.statusCode || 500;
     const errorMessage = error.message || "Internal server error";
     // Handle other errors
     res.status(statusCode).send({ result: "fail", error: errorMessage });
   }
+};
+
+const userToPlayer = (user, cosmosCharacterIdList, cosmosCharacterList, cosmosMain = true) => {
+  let cosmosCharacters = [];
+  if (user.associated_character_ids.length > 0) {
+    user.associated_character_ids.forEach((id) => {
+      if (cosmosCharacterIdList.includes(id)) {
+        const { characterId, corporationId, characterName } = cosmosCharacterList.find((c) => c.characterId === id);
+        cosmosCharacters = [...cosmosCharacters, { characterId, corporationId, characterName }];
+      }
+    });
+  }
+  const cosmosUser = { mainCharacterId: user.main_character_id, associatedCharacters: cosmosCharacters, name: user.name, cosmosMain };
+  return cosmosUser;
 };
